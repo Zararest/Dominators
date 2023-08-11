@@ -5,10 +5,11 @@
 #include <memory>
 #include <iostream>
 
-using OwnedNode = std::unique_ptr<NamedNode>; 
+template <typename T>
+class ReducibleGraphBuilder : public Node::Builder {
+  static_assert(std::is_base_of_v<Node, T>, "Graph should contain only Nodes");
+  using OwnedNode = std::unique_ptr<T>;
 
-// Mutates given node and owns secondary nodes
-class ReducibleGraphBuilder : public Node::NodeBuilder {
   std::vector<OwnedNode> SecondaryNodes;
   Node &Root;
   size_t Seed = 1u;
@@ -39,3 +40,5 @@ public:
 
   void printGraph(std::ostream &Stream);
 };
+
+#include <GraphBuilderImpl.hpp>

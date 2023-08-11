@@ -3,6 +3,7 @@
 #include <vector>
 #include <utility>
 #include <cassert>
+#include <algorithm>
 
 class Node;
 
@@ -16,7 +17,7 @@ protected:
   std::vector<Node*> Sucsessors;
   std::vector<Node*> Predecessors;
 
-  struct NodeBuilder_ {
+  struct Builder_ {
     ConstNodesRange getSucsessors(const Node &Node) const {
       return {Node.Sucsessors.begin(), Node.Sucsessors.end()};
     }
@@ -54,13 +55,13 @@ protected:
       std::swap(Lhs.Sucsessors, Rhs.Sucsessors);
     }
 
-    virtual ~NodeBuilder_() {}
+    virtual ~Builder_() {}
   };
 
   Node(){}
 
 public:
-  struct NodeBuilder : public NodeBuilder_ {};
+  struct Builder : public Builder_ {};
 
   Node(const Node&) = delete;
   Node operator=(const Node&) = delete;

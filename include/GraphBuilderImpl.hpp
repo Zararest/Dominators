@@ -1,9 +1,5 @@
-#include <GraphBuilder.h>
-
-#include <algorithm>
-#include <cassert>
-
-size_t ReducibleGraphBuilder::getRandomValue(size_t From, size_t To) {
+template <typename T>
+size_t ReducibleGraphBuilder<T>::getRandomValue(size_t From, size_t To) {
   assert(To > From);
   Seed ^= Seed << 13;
   Seed ^= Seed >> 7;
@@ -11,20 +7,24 @@ size_t ReducibleGraphBuilder::getRandomValue(size_t From, size_t To) {
   return From + (Seed % (To - From)); 
 } 
 
-void ReducibleGraphBuilder::splitNode(Node &NodeToSplit) {
-  
+template <typename T>
+void ReducibleGraphBuilder<T>::splitNode(Node &NodeToSplit) {
+
 }
 
 // adds back edge only if node doesn't have one
-void ReducibleGraphBuilder::addBackEdge(Node &NodeForEdge) {
+template <typename T>
+void ReducibleGraphBuilder<T>::addBackEdge(Node &NodeForEdge) {
 
 }
 
-void ReducibleGraphBuilder::addPathToSucsessor(Node &NodeForPath) {
+template <typename T>
+void ReducibleGraphBuilder<T>::addPathToSucsessor(Node &NodeForPath) {
 
 }
 
-void ReducibleGraphBuilder::mutate() {
+template <typename T>
+void ReducibleGraphBuilder<T>::mutate() {
   auto NodesNum = SecondaryNodes.size();
   Node &NodeToMutate = 
     (NodesNum == 0) ? Root
@@ -46,12 +46,13 @@ void ReducibleGraphBuilder::mutate() {
   }
 }
 
-void ReducibleGraphBuilder::printGraph(std::ostream &Stream) {
+template <typename T>
+void ReducibleGraphBuilder<T>::printGraph(std::ostream &Stream) {
   Stream << "digraph Dump {\n" <<
             "node[color=red,fontsize=14, style=filled]\n" <<
             &Root << " [label = \"Root\" fillcolor=green]\n" << std::endl;
   auto PrintSucsessors = [&Stream](const Node &CurNode) {
-    auto SucsRange = Node::NodeBuilder{}.getSucsessors(CurNode);
+    auto SucsRange = Node::Builder{}.getSucsessors(CurNode);
     std::for_each(SucsRange.begin, SucsRange.end, 
                   [&CurNode, &Stream](const Node *NodePtr) {
                     Stream << "\"" << &CurNode << "\"" << " -> " << 
@@ -61,8 +62,10 @@ void ReducibleGraphBuilder::printGraph(std::ostream &Stream) {
   PrintSucsessors(Root);
   std::for_each(SecondaryNodes.begin(), SecondaryNodes.end(), 
                 [&](const OwnedNode &CurNode) {
-                  Stream << "\"" << &CurNode << "\"" << " [label = \"" <<
-                  CurNode->getName() << "\" ]" << std::endl;
+                  if constexpr(std::is_base_of_v<NamedNode, T>) {
+                    Stream << "\"" << &CurNode << "\"" << " [label = \"" <<
+                    CurNode->getName() << "\" ]" << std::endl;
+                  }
                   PrintSucsessors(*CurNode.get());
                 });
 }
