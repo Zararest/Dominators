@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <utility>
+#include <cassert>
 
 class Node;
 
@@ -34,6 +35,23 @@ protected:
     void addPredecessor(Node &CurNode, Node &PrevNode) const {
       CurNode.Predecessors.push_back(&PrevNode);
       PrevNode.Sucsessors.push_back(&CurNode);
+    }
+
+    void swapSucsessors(Node &Lhs, Node &Rhs) const {
+      auto RebindPredecessorForSucsessors = [](Node &SrcNode, Node &NewNode) {
+        std::for_each(SrcNode.Sucsessors.begin(), SrcNode.Sucsessors.end(),
+                      [&NewNode, &SrcNode](Node *Sucs) {
+                        auto PredToChange = 
+                          std::find(Sucs->Predecessors.begin(),
+                                    Sucs->Predecessors.end(), 
+                                    &SrcNode);
+                        assert(PredToChange != Sucs->Predecessors.end());
+                        *PredToChange = &NewNode;
+                      });
+      };
+      RebindPredecessorForSucsessors(Lhs, Rhs);
+      RebindPredecessorForSucsessors(Rhs, Lhs);
+      std::swap(Lhs.Sucsessors, Rhs.Sucsessors);
     }
 
     virtual ~NodeBuilder_() {}

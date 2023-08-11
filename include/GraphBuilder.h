@@ -8,9 +8,24 @@
 using OwnedNode = std::unique_ptr<NamedNode>; 
 
 // Mutates given node and owns secondary nodes
-class ReducibleGraphBuilder : public NamedNode::NodeBuilder {
+class ReducibleGraphBuilder : public Node::NodeBuilder {
   std::vector<OwnedNode> SecondaryNodes;
   Node &Root;
+  size_t Seed = 1u;
+
+  enum Mutations {
+    Split,
+    BackEdge,
+    NewPath
+  };
+
+  size_t getRandomValue(size_t From, size_t To);
+
+  void splitNode(Node &NodeToSplit);
+  // adds back edge only if node doesn't have one
+  void addBackEdge(Node &NodeForEdge);
+
+  void addPathToSucsessor(Node &NodeForPath);
 
 public:
   ReducibleGraphBuilder(Node &RootNode) : Root{RootNode} {}
