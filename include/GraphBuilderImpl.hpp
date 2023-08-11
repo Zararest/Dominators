@@ -9,18 +9,41 @@ size_t ReducibleGraphBuilder<T>::getRandomValue(size_t From, size_t To) {
 
 template <typename T>
 void ReducibleGraphBuilder<T>::splitNode(Node &NodeToSplit) {
-
+  auto NewNode = typename T::Builder{}.createNode();
+  auto &NewNodeRef = *NewNode.get();
+  auto DefaultBuilder = Node::Builder{};
+  DefaultBuilder.swapSucsessors(NewNodeRef, NodeToSplit);
+  DefaultBuilder.addSucsessor(NodeToSplit, NewNodeRef);
+  SecondaryNodes.emplace_back(std::move(NewNode));
 }
 
+// FIXME: check if this will be reducible graph
 // adds back edge only if node doesn't have one
 template <typename T>
 void ReducibleGraphBuilder<T>::addBackEdge(Node &NodeForEdge) {
-
+  auto DefaultBuilder = Node::Builder{};
+  auto Sucsessors = DefaultBuilder.getSucsessors(NodeForEdge);
+  auto BackEdgeNode = std::find(Sucsessors.begin, 
+                                Sucsessors.end, 
+                                &NodeForEdge);
+  if (BackEdgeNode != Sucsessors.end)
+    return;
+  DefaultBuilder.addSucsessor(NodeForEdge, NodeForEdge);
 }
 
 template <typename T>
 void ReducibleGraphBuilder<T>::addPathToSucsessor(Node &NodeForPath) {
-
+  auto DefaultBuilder = Node::Builder{};
+  auto Sucsessors = DefaultBuilder.getMutableSucsessors(NodeForPath);
+  auto NumOfSucsessors = std::distance(Sucsessors.begin, Sucsessors.end);
+  if (NumOfSucsessors == 0)
+    return;
+  auto DuplicatePathTo = getRandomValue(0, NumOfSucsessors);
+  auto NewNode = typename T::Builder{}.createNode();
+  auto &NewNodeRef = *NewNode.get();
+  DefaultBuilder.addSucsessor(NodeForPath, NewNodeRef);
+  auto SucsPtr = *(Sucsessors.begin + DuplicatePathTo);
+  DefaultBuilder.addSucsessor(NewNodeRef, *SucsPtr);
 }
 
 template <typename T>

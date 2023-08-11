@@ -5,6 +5,13 @@
 #include <memory>
 #include <iostream>
 
+/*
+  Each node class has builder struct 
+  in order to separate nodes properties from creation logic.
+  ReducibleGraphBuilder requires createNode() function from builder.
+*/
+
+// FIXME: move nodes to the separate container
 template <typename T>
 class ReducibleGraphBuilder : public Node::Builder {
   static_assert(std::is_base_of_v<Node, T>, "Graph should contain only Nodes");

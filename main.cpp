@@ -2,7 +2,7 @@
 
 int main() {
   auto Root = Node::Builder{}.createNode();
-  ReducibleGraphBuilder<Node> Obj{Root};
+  ReducibleGraphBuilder<NamedNode> Obj{*Root.get()};
   Obj.mutate();
   Obj.printGraph(std::cout);
 }

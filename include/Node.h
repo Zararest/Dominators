@@ -4,12 +4,18 @@
 #include <utility>
 #include <cassert>
 #include <algorithm>
+#include <memory>
 
 class Node;
 
 struct ConstNodesRange {
   std::vector<Node*>::const_iterator begin;
   std::vector<Node*>::const_iterator end;
+};
+
+struct NodesRange {
+  std::vector<Node*>::iterator begin;
+  std::vector<Node*>::iterator end;
 };
 
 class Node {
@@ -26,16 +32,21 @@ protected:
       return {Node.Predecessors.begin(), Node.Predecessors.end()};
     }
 
-    Node createNode() const { return {}; }
+    NodesRange getMutableSucsessors(Node &Node) const {
+      return {Node.Sucsessors.begin(), Node.Sucsessors.end()};
+    }
+
+    NodesRange getMutablePredecessors(Node &Node) const {
+      return {Node.Predecessors.begin(), Node.Predecessors.end()};
+    }
+
+    std::unique_ptr<Node> createNode() const { 
+      return std::unique_ptr<Node>(new Node); 
+    }
 
     void addSucsessor(Node &CurNode, Node &NextNode) const {
       CurNode.Sucsessors.push_back(&NextNode);
       NextNode.Predecessors.push_back(&CurNode);
-    }
-
-    void addPredecessor(Node &CurNode, Node &PrevNode) const {
-      CurNode.Predecessors.push_back(&PrevNode);
-      PrevNode.Sucsessors.push_back(&CurNode);
     }
 
     void swapSucsessors(Node &Lhs, Node &Rhs) const {

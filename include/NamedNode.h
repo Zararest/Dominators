@@ -5,10 +5,11 @@
 class NamedNode : public Node {
   std::string Name = "Unnamed";
   
-  struct Builder_ : public Node::Builder {
-    NamedNode createNamedNode(const std::string &Name) {
-      return {Name};
-    }
+  class Builder_ : public Node::Builder {
+    static size_t NodesCreated; 
+
+  public:
+    std::unique_ptr<NamedNode> createNode();
   };
 
   NamedNode(const std::string &Name) : Name{Name} {} 
