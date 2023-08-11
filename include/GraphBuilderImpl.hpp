@@ -34,7 +34,7 @@ void ReducibleGraphBuilder<T>::addBackEdge(Node &NodeForEdge) {
 template <typename T>
 void ReducibleGraphBuilder<T>::addPathToSucsessor(Node &NodeForPath) {
   auto DefaultBuilder = Node::Builder{};
-  auto Sucsessors = DefaultBuilder.getMutableSucsessors(NodeForPath);
+  auto Sucsessors = DefaultBuilder.getSucsessors(NodeForPath);
   auto NumOfSucsessors = std::distance(Sucsessors.begin, Sucsessors.end);
   if (NumOfSucsessors == 0)
     return;
@@ -42,8 +42,10 @@ void ReducibleGraphBuilder<T>::addPathToSucsessor(Node &NodeForPath) {
   auto NewNode = typename T::Builder{}.createNode();
   auto &NewNodeRef = *NewNode.get();
   DefaultBuilder.addSucsessor(NodeForPath, NewNodeRef);
-  auto SucsPtr = *(Sucsessors.begin + DuplicatePathTo);
+  auto NewSucsessors = DefaultBuilder.getMutableSucsessors(NodeForPath);
+  auto SucsPtr = *(NewSucsessors.begin + DuplicatePathTo);
   DefaultBuilder.addSucsessor(NewNodeRef, *SucsPtr);
+  SecondaryNodes.emplace_back(std::move(NewNode));
 }
 
 template <typename T>
@@ -73,7 +75,7 @@ template <typename T>
 void ReducibleGraphBuilder<T>::printGraph(std::ostream &Stream) {
   Stream << "digraph Dump {\n" <<
             "node[color=red,fontsize=14, style=filled]\n" <<
-            &Root << " [label = \"Root\" fillcolor=green]\n" << std::endl;
+            "\"" << &Root << "\"" << " [label = \"Root\" fillcolor=green]\n";
   auto PrintSucsessors = [&Stream](const Node &CurNode) {
     auto SucsRange = Node::Builder{}.getSucsessors(CurNode);
     std::for_each(SucsRange.begin, SucsRange.end, 
@@ -86,9 +88,10 @@ void ReducibleGraphBuilder<T>::printGraph(std::ostream &Stream) {
   std::for_each(SecondaryNodes.begin(), SecondaryNodes.end(), 
                 [&](const OwnedNode &CurNode) {
                   if constexpr(std::is_base_of_v<NamedNode, T>) {
-                    Stream << "\"" << &CurNode << "\"" << " [label = \"" <<
+                    Stream << "\"" << CurNode.get() << "\"" << " [label = \"" <<
                     CurNode->getName() << "\" ]" << std::endl;
                   }
                   PrintSucsessors(*CurNode.get());
                 });
+  Stream << "}" << std::endl;
 }

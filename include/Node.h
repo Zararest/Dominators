@@ -5,6 +5,7 @@
 #include <cassert>
 #include <algorithm>
 #include <memory>
+#include <iostream>
 
 class Node;
 
