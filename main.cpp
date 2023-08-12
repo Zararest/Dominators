@@ -1,7 +1,6 @@
 #include <GraphBuilder.h>
 #include <Utils.h>
-#include <MetadataNode.h>
-#include <DomMetadata.h>
+#include <DomTreeBuilder.h>
 
 #include <fstream>
 
@@ -23,4 +22,7 @@ int main() {
   for (auto &It : RPO)
     OrderStream << static_cast<DomNode*>(It)->getName() << " | ";
   OrderStream << std::endl;
+
+  auto DomBuilder = DomTreeBuilder<MetadataNode<DomMetadata>>{};
+  DomBuilder.calcDominators(*Root.get(), Beg, End);
 }

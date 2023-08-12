@@ -2,6 +2,10 @@
 
 #include <NamedNode.h>
 
+template <typename It>
+using GetTypeFromOwnedNodeIt = typename std::iterator_traits<It>
+                                        ::value_type::element_type;
+
 std::vector<Node*> getReversePostOrder(Node &Root);
 
 // Works with unique ptrs
@@ -12,7 +16,7 @@ void printGraph(It NodesBeg, It NodesEnd, RootT &Root, std::ostream &Stream) {
             "\"" << &Root << "\"" << " [label = \"Root\" fillcolor=green]\n";
   auto PrintSucsessors = [&Stream](const Node &CurNode) {
     auto SucsRange = Node::Builder{}.getSucsessors(CurNode);
-    std::for_each(SucsRange.begin, SucsRange.end, 
+    std::for_each(SucsRange.Begin, SucsRange.End, 
                   [&CurNode, &Stream](const Node *NodePtr) {
                     Stream << "\"" << &CurNode << "\"" << " -> " << 
                               "\"" << NodePtr << "\"" << std::endl;
@@ -22,8 +26,7 @@ void printGraph(It NodesBeg, It NodesEnd, RootT &Root, std::ostream &Stream) {
   std::for_each(NodesBeg, NodesEnd, 
                 [&](auto &CurNode) {
                   if constexpr(std::is_base_of_v<NamedNode, 
-                              typename std::iterator_traits<It>
-                                ::value_type::element_type>) {
+                                                 GetTypeFromOwnedNodeIt<It>>) {
                     Stream << "\"" << CurNode.get() << "\"" << " [label = \"" <<
                     CurNode->getName() << "\" ]" << std::endl;
                   }

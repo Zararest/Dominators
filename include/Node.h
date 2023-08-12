@@ -10,13 +10,25 @@
 class Node;
 
 struct ConstNodesRange {
-  std::vector<Node*>::const_iterator begin;
-  std::vector<Node*>::const_iterator end;
+  std::vector<Node*>::const_iterator Begin;
+  std::vector<Node*>::const_iterator End;
 };
 
 struct NodesRange {
-  std::vector<Node*>::iterator begin;
-  std::vector<Node*>::iterator end;
+  std::vector<Node*>::iterator Begin;
+  std::vector<Node*>::iterator End;
+};
+
+template <typename T>
+struct ConstOwnedNodesRange {
+  typename std::vector<std::unique_ptr<T>>::const_iterator Begin;
+  typename std::vector<std::unique_ptr<T>>::const_iterator End;
+};
+
+template <typename T>
+struct OwnedNodesRange {
+  typename std::vector<std::unique_ptr<T>>::iterator Begin;
+  typename std::vector<std::unique_ptr<T>>::iterator End;
 };
 
 class Node {

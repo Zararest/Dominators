@@ -7,6 +7,7 @@ class MetadataNode : public NamedNode {
 protected:
   static_assert(std::is_default_constructible<Meta>::value, 
     "Metadata should be default constructable");
+
   Meta Metadata;
 
   class Builder_ : public NamedNode::Builder_ {
@@ -32,6 +33,8 @@ protected:
   MetadataNode() {}
 
 public:
+  using MetaDataT = Meta;
+
   struct Builder : public Builder_ {
     virtual ~Builder() = default;
   };
