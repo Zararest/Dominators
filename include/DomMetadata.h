@@ -1,25 +1,42 @@
 #pragma once
 
+#include <MetadataNode.h>
+
 #include <algorithm>
 #include <unordered_set>
 
-using DomSetT = std::unordered_set<Node *>;
+using DomSetT = std::unordered_set<Node*>;
 
-struct DomMetadata final {
+struct DomMetadata : public DefaultMeta {
   // all nodes that dominates current node
   DomSetT Dominators;
   bool IsDominatedByAll = true;
 
-  static DomMetadata getDomIntersection(const DomMetadata &Lhs,
-                                        const DomMetadata &Rhs) {
-    if (Lhs.IsDominatedByAll)
-      return Rhs;
-    if (Rhs.IsDominatedByAll)
-      return Lhs;
-    auto IntersectSet = DomSetT{};
-    std::set_intersection(Lhs.Dominators.begin(), Lhs.Dominators.end(),
-                          Rhs.Dominators.begin(), Rhs.Dominators.end(),
-                          std::inserter(IntersectSet, IntersectSet.begin()));
-    return {IntersectSet, false};
+  void intersect(const DomMetadata &PredMeta) {
+    if (&PredMeta == this)
+      return;
+    if (PredMeta.IsDominatedByAll)
+      return;
+    if (IsDominatedByAll) {
+      Dominators = PredMeta.Dominators;
+      IsDominatedByAll = false;
+    }
+    auto Intersection = DomSetT{};
+    auto &SmallerSetRef = 
+      Dominators.size() < PredMeta.Dominators.size() ? Dominators
+                                                     : PredMeta.Dominators;
+    auto &BiggerSetRef =
+      Dominators.size() >= PredMeta.Dominators.size() ? Dominators
+                                                      : PredMeta.Dominators;
+    std::for_each(SmallerSetRef.begin(), SmallerSetRef.end(),
+                  [&](Node *DomNode) {
+                    if (BiggerSetRef.find(DomNode) != BiggerSetRef.end()) {
+                      auto [_, Inserted] = Intersection.insert(DomNode);
+                      assert(Inserted);
+                    }
+                  });
+    std::swap(Dominators, Intersection);
   }
+
+  virtual ~DomMetadata() = default;
 };
