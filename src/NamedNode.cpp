@@ -2,8 +2,13 @@
 
 size_t NamedNode::Builder_::NodesCreated = 0;
 
-std::unique_ptr<NamedNode> NamedNode::Builder_::createNode() {
+void NamedNode::Builder_::configNode(NamedNode &Node) {
   NodesCreated++;
-  return std::unique_ptr<NamedNode>(
-          new NamedNode(std::to_string(NodesCreated)));
+  Node.setName(std::to_string(NodesCreated));
+}
+
+std::unique_ptr<NamedNode> NamedNode::Builder_::createNode() {
+  auto NewNode = std::unique_ptr<NamedNode>(new NamedNode());
+  configNode(*NewNode.get());
+  return NewNode;
 }

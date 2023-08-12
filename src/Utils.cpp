@@ -1,9 +1,9 @@
-#include <RPO.h>
+#include <Utils.h>
 
 #include <unordered_set>
 #include <cassert>
 
-std::vector<Node*> RPO::getOrder(Node &Root) {
+std::vector<Node*> getReversePostOrder(Node &Root) {
   auto Visited = std::unordered_set<Node*>{};
   auto Postorder = std::vector<Node*>{};
   auto NodesTrace = std::vector<Node*>{&Root};

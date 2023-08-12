@@ -11,6 +11,12 @@
   ReducibleGraphBuilder requires createNode() function from builder.
 */
 
+template <typename T>
+struct ConstOwnedNodesRange {
+  typename std::vector<std::unique_ptr<T>>::const_iterator begin;
+  typename std::vector<std::unique_ptr<T>>::const_iterator end;
+};
+
 // FIXME: move nodes to the separate container
 template <typename T>
 class ReducibleGraphBuilder : public Node::Builder {
@@ -45,7 +51,9 @@ public:
   //  -add another way to the one of the sucsessors
   void mutate();
 
-  void printGraph(std::ostream &Stream);
+  ConstOwnedNodesRange<T> getNodes() const {
+    return {SecondaryNodes.begin(), SecondaryNodes.end()};
+  }
 };
 
 #include <GraphBuilderImpl.hpp>

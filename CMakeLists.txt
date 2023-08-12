@@ -7,6 +7,6 @@ add_executable(Proto main.cpp)
 target_link_libraries(Proto PRIVATE
                       NamedNode) 
 target_link_libraries(Proto PRIVATE
-                      RPO)                                                         
+                      Utils)                                                         
 
 add_subdirectory(src)

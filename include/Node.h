@@ -67,16 +67,18 @@ protected:
       std::swap(Lhs.Sucsessors, Rhs.Sucsessors);
     }
 
-    virtual ~Builder_() {}
+    virtual ~Builder_() = default;
   };
 
   Node(){}
 
 public:
-  struct Builder : public Builder_ {};
+  struct Builder : public Builder_ {
+    virtual ~Builder() = default;
+  };
 
   Node(const Node&) = delete;
   Node operator=(const Node&) = delete;
 
-  virtual ~Node(){}
+  virtual ~Node() = default;
 };
