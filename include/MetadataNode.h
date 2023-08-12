@@ -15,6 +15,10 @@ protected:
       NamedNode::Builder_::configNode(Node);
     }
 
+    Meta &getMutableMetadata(MetadataNode &Node) {
+      return Node.Metadata;
+    }
+
   public:  
     std::unique_ptr<MetadataNode> createNode() {
       auto NewNode = std::unique_ptr<MetadataNode>(new MetadataNode);
@@ -33,10 +37,6 @@ public:
   };
 
   const Meta &getMetadata() const {
-    return Metadata;
-  }
-
-  Meta &getMutableMetadata() {
     return Metadata;
   }
 

@@ -11,9 +11,8 @@ template <typename T>
 void ReducibleGraphBuilder<T>::splitNode(Node &NodeToSplit) {
   auto NewNode = typename T::Builder{}.createNode();
   auto &NewNodeRef = *NewNode.get();
-  auto DefaultBuilder = Node::Builder{};
-  DefaultBuilder.swapSucsessors(NewNodeRef, NodeToSplit);
-  DefaultBuilder.addSucsessor(NodeToSplit, NewNodeRef);
+  swapSucsessors(NewNodeRef, NodeToSplit);
+  addSucsessor(NodeToSplit, NewNodeRef);
   SecondaryNodes.emplace_back(std::move(NewNode));
 }
 
@@ -21,30 +20,28 @@ void ReducibleGraphBuilder<T>::splitNode(Node &NodeToSplit) {
 // adds back edge only if node doesn't have one
 template <typename T>
 void ReducibleGraphBuilder<T>::addBackEdge(Node &NodeForEdge) {
-  auto DefaultBuilder = Node::Builder{};
-  auto [SucsBeg, SucsEnd] = DefaultBuilder.getSucsessors(NodeForEdge);
+  auto [SucsBeg, SucsEnd] = getSucsessors(NodeForEdge);
   auto BackEdgeNode = std::find(SucsBeg, 
                                 SucsEnd, 
                                 &NodeForEdge);
   if (BackEdgeNode != SucsEnd)
     return;
-  DefaultBuilder.addSucsessor(NodeForEdge, NodeForEdge);
+  addSucsessor(NodeForEdge, NodeForEdge);
 }
 
 template <typename T>
 void ReducibleGraphBuilder<T>::addPathToSucsessor(Node &NodeForPath) {
-  auto DefaultBuilder = Node::Builder{};
-  auto [SucsBeg, SucsEnd] = DefaultBuilder.getSucsessors(NodeForPath);
+  auto [SucsBeg, SucsEnd] = getSucsessors(NodeForPath);
   auto NumOfSucsessors = std::distance(SucsBeg, SucsEnd);
   if (NumOfSucsessors == 0)
     return;
   auto DuplicatePathTo = getRandomValue(0, NumOfSucsessors);
   auto NewNode = typename T::Builder{}.createNode();
   auto &NewNodeRef = *NewNode.get();
-  DefaultBuilder.addSucsessor(NodeForPath, NewNodeRef);
-  auto [NewSucsBeg, _] = DefaultBuilder.getMutableSucsessors(NodeForPath);
+  addSucsessor(NodeForPath, NewNodeRef);
+  auto [NewSucsBeg, _] = getMutableSucsessors(NodeForPath);
   auto SucsPtr = *(NewSucsBeg + DuplicatePathTo);
-  DefaultBuilder.addSucsessor(NewNodeRef, *SucsPtr);
+  addSucsessor(NewNodeRef, *SucsPtr);
   SecondaryNodes.emplace_back(std::move(NewNode));
 }
 

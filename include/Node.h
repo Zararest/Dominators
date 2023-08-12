@@ -24,15 +24,8 @@ protected:
   std::vector<Node*> Sucsessors;
   std::vector<Node*> Predecessors;
 
-  struct Builder_ {
-    ConstNodesRange getSucsessors(const Node &Node) const {
-      return {Node.Sucsessors.begin(), Node.Sucsessors.end()};
-    }
-
-    ConstNodesRange getPredecessors(const Node &Node) const {
-      return {Node.Predecessors.begin(), Node.Predecessors.end()};
-    }
-
+  class Builder_ {
+  protected:
     NodesRange getMutableSucsessors(Node &Node) const {
       return {Node.Sucsessors.begin(), Node.Sucsessors.end()};
     }
@@ -65,6 +58,15 @@ protected:
       RebindPredecessorForSucsessors(Lhs, Rhs);
       RebindPredecessorForSucsessors(Rhs, Lhs);
       std::swap(Lhs.Sucsessors, Rhs.Sucsessors);
+    }
+
+  public:
+    ConstNodesRange getSucsessors(const Node &Node) const {
+      return {Node.Sucsessors.begin(), Node.Sucsessors.end()};
+    }
+
+    ConstNodesRange getPredecessors(const Node &Node) const {
+      return {Node.Predecessors.begin(), Node.Predecessors.end()};
     }
 
     virtual ~Builder_() = default;
