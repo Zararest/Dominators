@@ -26,7 +26,7 @@ public:
     return {DomTreeNodes.begin(), DomTreeNodes.end()};
   }
 
-  const NamedNode &getDomRoot() const { return *DomRoot.get(); }
+  const NamedNode &getDomRoot() const { return *DomRoot; }
 };
 
 #include <DomTreeBuilderImpl.hpp>

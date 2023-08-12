@@ -12,14 +12,15 @@ struct DomMetadata : public DefaultMeta {
   DomSetT Dominators;
   bool IsDominatedByAll = true;
 
-  void intersect(const DomMetadata &PredMeta) {
+  bool intersect(const DomMetadata &PredMeta) {
     if (&PredMeta == this)
-      return;
+      return false;
     if (PredMeta.IsDominatedByAll)
-      return;
+      return false;
     if (IsDominatedByAll) {
       Dominators = PredMeta.Dominators;
       IsDominatedByAll = false;
+      return true;
     }
     auto Intersection = DomSetT{};
     auto &SmallerSetRef = 
@@ -35,7 +36,11 @@ struct DomMetadata : public DefaultMeta {
                       assert(Inserted);
                     }
                   });
+    assert(Dominators.size() >= Intersection.size());
     std::swap(Dominators, Intersection);
+    if (Dominators.size() != Intersection.size())
+      return true;
+    return false;
   }
 
   virtual ~DomMetadata() = default;

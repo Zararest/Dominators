@@ -37,7 +37,7 @@ void printGraph(It NodesBeg, It NodesEnd, RootT &Root, std::ostream &Stream) {
       Stream << "\"" << CurNode.get() << "\""
              << " [label = \"" << CurNode->getName() << "\" ]" << std::endl;
     }
-    PrintSucsessors(*CurNode.get());
+    PrintSucsessors(*CurNode);
   });
   Stream << "}" << std::endl;
 }

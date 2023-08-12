@@ -23,13 +23,13 @@ protected:
 
     Meta &getMutableMetadata(MetadataNode &Node) { 
       assert(Node.Metadata.get());
-      return *Node.Metadata.get(); 
+      return *Node.Metadata; 
     }
 
   public:
     std::unique_ptr<MetadataNode> createNode() {
       auto NewNode = std::unique_ptr<MetadataNode>(new MetadataNode);
-      configNode(*NewNode.get());
+      configNode(*NewNode);
       return NewNode;
     }
 
@@ -47,7 +47,7 @@ public:
 
   const Meta &getMetadata() const { 
     assert(Metadata.get());
-    return *Metadata.get(); 
+    return *Metadata; 
   }
 
   virtual ~MetadataNode() = default;

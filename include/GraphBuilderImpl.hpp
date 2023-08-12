@@ -10,7 +10,7 @@ size_t ReducibleGraphBuilder<T>::getRandomValue(size_t From, size_t To) {
 template <typename T>
 void ReducibleGraphBuilder<T>::splitNode(Node &NodeToSplit) {
   auto NewNode = typename T::Builder{}.createNode();
-  auto &NewNodeRef = *NewNode.get();
+  auto &NewNodeRef = *NewNode;
   swapSucsessors(NewNodeRef, NodeToSplit);
   addSucsessor(NodeToSplit, NewNodeRef);
   SecondaryNodes.emplace_back(std::move(NewNode));
@@ -35,7 +35,7 @@ void ReducibleGraphBuilder<T>::addPathToSucsessor(Node &NodeForPath) {
     return;
   auto DuplicatePathTo = getRandomValue(0, NumOfSucsessors);
   auto NewNode = typename T::Builder{}.createNode();
-  auto &NewNodeRef = *NewNode.get();
+  auto &NewNodeRef = *NewNode;
   addSucsessor(NodeForPath, NewNodeRef);
   auto [NewSucsBeg, _] = getMutableSucsessors(NodeForPath);
   auto SucsPtr = *(NewSucsBeg + DuplicatePathTo);
@@ -47,7 +47,7 @@ template <typename T> void ReducibleGraphBuilder<T>::mutate() {
   auto NodesNum = SecondaryNodes.size();
   Node &NodeToMutate = (NodesNum == 0)
                            ? Root
-                           : *SecondaryNodes[getRandomValue(0, NodesNum)].get();
+                           : *SecondaryNodes[getRandomValue(0, NodesNum)];
   constexpr auto MutationsNum = 3;
   switch (getRandomValue(0, MutationsNum)) {
   case Split:

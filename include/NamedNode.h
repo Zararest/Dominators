@@ -16,13 +16,15 @@ protected:
   protected:
     void configNode(NamedNode &Node);
 
+    void setName(NamedNode &Node, const std::string &NewName) { 
+      Node.Name = NewName; 
+    }
+
   public:
     std::unique_ptr<NamedNode> createNode();
 
     virtual ~Builder_() = default;
   };
-
-  void setName(const std::string &NewName) { Name = NewName; }
 
   NamedNode() {}
 
