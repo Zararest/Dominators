@@ -22,11 +22,11 @@ void ReducibleGraphBuilder<T>::splitNode(Node &NodeToSplit) {
 template <typename T>
 void ReducibleGraphBuilder<T>::addBackEdge(Node &NodeForEdge) {
   auto DefaultBuilder = Node::Builder{};
-  auto Sucsessors = DefaultBuilder.getSucsessors(NodeForEdge);
-  auto BackEdgeNode = std::find(Sucsessors.begin, 
-                                Sucsessors.end, 
+  auto [SucsBeg, SucsEnd] = DefaultBuilder.getSucsessors(NodeForEdge);
+  auto BackEdgeNode = std::find(SucsBeg, 
+                                SucsEnd, 
                                 &NodeForEdge);
-  if (BackEdgeNode != Sucsessors.end)
+  if (BackEdgeNode != SucsEnd)
     return;
   DefaultBuilder.addSucsessor(NodeForEdge, NodeForEdge);
 }
@@ -34,16 +34,16 @@ void ReducibleGraphBuilder<T>::addBackEdge(Node &NodeForEdge) {
 template <typename T>
 void ReducibleGraphBuilder<T>::addPathToSucsessor(Node &NodeForPath) {
   auto DefaultBuilder = Node::Builder{};
-  auto Sucsessors = DefaultBuilder.getSucsessors(NodeForPath);
-  auto NumOfSucsessors = std::distance(Sucsessors.begin, Sucsessors.end);
+  auto [SucsBeg, SucsEnd] = DefaultBuilder.getSucsessors(NodeForPath);
+  auto NumOfSucsessors = std::distance(SucsBeg, SucsEnd);
   if (NumOfSucsessors == 0)
     return;
   auto DuplicatePathTo = getRandomValue(0, NumOfSucsessors);
   auto NewNode = typename T::Builder{}.createNode();
   auto &NewNodeRef = *NewNode.get();
   DefaultBuilder.addSucsessor(NodeForPath, NewNodeRef);
-  auto NewSucsessors = DefaultBuilder.getMutableSucsessors(NodeForPath);
-  auto SucsPtr = *(NewSucsessors.begin + DuplicatePathTo);
+  auto [NewSucsBeg, _] = DefaultBuilder.getMutableSucsessors(NodeForPath);
+  auto SucsPtr = *(NewSucsBeg + DuplicatePathTo);
   DefaultBuilder.addSucsessor(NewNodeRef, *SucsPtr);
   SecondaryNodes.emplace_back(std::move(NewNode));
 }

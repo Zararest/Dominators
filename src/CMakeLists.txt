@@ -1,2 +1,5 @@
 add_library(NamedNode STATIC 
-            NamedNode.cpp)       
+            NamedNode.cpp)
+        
+add_library(RPO STATIC
+            RPO.cpp)
