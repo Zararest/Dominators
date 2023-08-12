@@ -1,16 +1,16 @@
 #pragma once
 
-#include <unordered_set>
 #include <algorithm>
+#include <unordered_set>
 
-using DomSetT = std::unordered_set<Node*>;
+using DomSetT = std::unordered_set<Node *>;
 
 struct DomMetadata final {
   // all nodes that dominates current node
-  DomSetT Dominators; 
+  DomSetT Dominators;
   bool IsDominatedByAll = true;
 
-  static DomMetadata getDomIntersection(const DomMetadata &Lhs, 
+  static DomMetadata getDomIntersection(const DomMetadata &Lhs,
                                         const DomMetadata &Rhs) {
     if (Lhs.IsDominatedByAll)
       return Rhs;

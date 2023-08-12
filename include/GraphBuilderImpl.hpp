@@ -4,8 +4,8 @@ size_t ReducibleGraphBuilder<T>::getRandomValue(size_t From, size_t To) {
   Seed ^= Seed << 13;
   Seed ^= Seed >> 7;
   Seed ^= Seed << 17;
-  return From + (Seed % (To - From)); 
-} 
+  return From + (Seed % (To - From));
+}
 
 template <typename T>
 void ReducibleGraphBuilder<T>::splitNode(Node &NodeToSplit) {
@@ -21,9 +21,7 @@ void ReducibleGraphBuilder<T>::splitNode(Node &NodeToSplit) {
 template <typename T>
 void ReducibleGraphBuilder<T>::addBackEdge(Node &NodeForEdge) {
   auto [SucsBeg, SucsEnd] = getSucsessors(NodeForEdge);
-  auto BackEdgeNode = std::find(SucsBeg, 
-                                SucsEnd, 
-                                &NodeForEdge);
+  auto BackEdgeNode = std::find(SucsBeg, SucsEnd, &NodeForEdge);
   if (BackEdgeNode != SucsEnd)
     return;
   addSucsessor(NodeForEdge, NodeForEdge);
@@ -45,25 +43,24 @@ void ReducibleGraphBuilder<T>::addPathToSucsessor(Node &NodeForPath) {
   SecondaryNodes.emplace_back(std::move(NewNode));
 }
 
-template <typename T>
-void ReducibleGraphBuilder<T>::mutate() {
+template <typename T> void ReducibleGraphBuilder<T>::mutate() {
   auto NodesNum = SecondaryNodes.size();
-  Node &NodeToMutate = 
-    (NodesNum == 0) ? Root
-                  : *SecondaryNodes[getRandomValue(0, NodesNum)].get();
+  Node &NodeToMutate = (NodesNum == 0)
+                           ? Root
+                           : *SecondaryNodes[getRandomValue(0, NodesNum)].get();
   constexpr auto MutationsNum = 3;
   switch (getRandomValue(0, MutationsNum)) {
-    case Split:
-      splitNode(NodeToMutate);
+  case Split:
+    splitNode(NodeToMutate);
     break;
-    case BackEdge:
-      addBackEdge(NodeToMutate);
+  case BackEdge:
+    addBackEdge(NodeToMutate);
     break;
-    case NewPath:
-      addPathToSucsessor(NodeToMutate);
+  case NewPath:
+    addPathToSucsessor(NodeToMutate);
     break;
-    default:
-      assert(false && "Unreachable");
+  default:
+    assert(false && "Unreachable");
     break;
   }
 }

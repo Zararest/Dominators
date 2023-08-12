@@ -7,12 +7,12 @@
 class NamedNode : public Node {
 protected:
   std::string Name = "Unnamed";
-  
+
   // Private builders has protected configNode method,
   //  so each sucsessor should be inherited from previous private builder.
   class Builder_ : public Node::Builder_ {
-    static size_t NodesCreated; 
-  
+    static size_t NodesCreated;
+
   protected:
     void configNode(NamedNode &Node);
 
@@ -22,20 +22,16 @@ protected:
     virtual ~Builder_() = default;
   };
 
-  void setName(const std::string &NewName) {
-    Name = NewName;
-  }
+  void setName(const std::string &NewName) { Name = NewName; }
 
-  NamedNode() {} 
+  NamedNode() {}
 
-public: 
+public:
   struct Builder : public Builder_ {
     virtual ~Builder() = default;
   };
 
-  std::string getName() const {
-    return Name;
-  }
+  std::string getName() const { return Name; }
 
   virtual ~NamedNode() = default;
 };

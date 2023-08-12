@@ -2,11 +2,10 @@
 
 #include <NamedNode.h>
 
-template <typename Meta>
-class MetadataNode : public NamedNode {
+template <typename Meta> class MetadataNode : public NamedNode {
 protected:
-  static_assert(std::is_default_constructible<Meta>::value, 
-    "Metadata should be default constructable");
+  static_assert(std::is_default_constructible<Meta>::value,
+                "Metadata should be default constructable");
 
   Meta Metadata;
 
@@ -16,11 +15,9 @@ protected:
       NamedNode::Builder_::configNode(Node);
     }
 
-    Meta &getMutableMetadata(MetadataNode &Node) {
-      return Node.Metadata;
-    }
+    Meta &getMutableMetadata(MetadataNode &Node) { return Node.Metadata; }
 
-  public:  
+  public:
     std::unique_ptr<MetadataNode> createNode() {
       auto NewNode = std::unique_ptr<MetadataNode>(new MetadataNode);
       configNode(*NewNode.get());
@@ -39,9 +36,7 @@ public:
     virtual ~Builder() = default;
   };
 
-  const Meta &getMetadata() const {
-    return Metadata;
-  }
+  const Meta &getMetadata() const { return Metadata; }
 
   virtual ~MetadataNode() = default;
 };

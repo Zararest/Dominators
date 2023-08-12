@@ -2,18 +2,17 @@
 
 #include <NamedNode.h>
 
-#include <memory>
 #include <iostream>
+#include <memory>
 
 /*
-  Each node class has builder struct 
+  Each node class has builder struct
   in order to separate nodes properties from creation logic.
   ReducibleGraphBuilder requires createNode() function from builder.
 */
 
 // FIXME: move nodes to the separate container
-template <typename T>
-class ReducibleGraphBuilder : public Node::Builder {
+template <typename T> class ReducibleGraphBuilder : public Node::Builder {
   static_assert(std::is_base_of_v<Node, T>, "Graph should contain only Nodes");
   using OwnedNode = std::unique_ptr<T>;
 
@@ -21,11 +20,7 @@ class ReducibleGraphBuilder : public Node::Builder {
   Node &Root;
   size_t Seed = 1u;
 
-  enum Mutations {
-    Split,
-    BackEdge,
-    NewPath
-  };
+  enum Mutations { Split, BackEdge, NewPath };
 
   size_t getRandomValue(size_t From, size_t To);
 
