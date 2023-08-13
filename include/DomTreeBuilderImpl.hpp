@@ -37,25 +37,34 @@ template <typename OwnedNodeIt>
 void DomTreeBuilder<NodeT>::createDomGraph(NodeT &Root, OwnedNodeIt NodesBeg,
                                            OwnedNodeIt NodesEnd) {
   calcDominators(Root, NodesBeg, NodesEnd);
-  auto MapInitNodesToDomNodes = 
-    createUnrelatedDomNodes(Root, NodesBeg, NodesEnd);
-  createDomRelations(MapInitNodesToDomNodes);
+  auto MapOrigNodesToDomNodes =
+      createUnrelatedDomNodes(Root, NodesBeg, NodesEnd);
+  createDomRelations(MapOrigNodesToDomNodes);
+}
+
+template <typename NodeT>
+template <typename OwnedNodeIt>
+void DomTreeBuilder<NodeT>::createDomTree(NodeT &Root, OwnedNodeIt NodesBeg,
+                                          OwnedNodeIt NodesEnd) {
+  calcDominators(Root, NodesBeg, NodesEnd);
+  auto MapOrigNodesToDomNodes =
+      createUnrelatedDomNodes(Root, NodesBeg, NodesEnd);
+  createIDomRelations(MapOrigNodesToDomNodes);
 }
 
 template <typename NodeT>
 void DomTreeBuilder<NodeT>::createDomRelations(
     std::unordered_map<const Node *, DomNode *> &NodesToDomNodesMapping) {
   auto AddNodeDominators = [&](std::unique_ptr<DomNode> &DomNode) {
-    auto &InitNode = DomNode->getMetadata().getOriginalNode();
-    auto &DomMeta = static_cast<const NodeT *>(&InitNode)->getMetadata();
-    auto [InitNodeDomBeg, InitNodeDomEnd] = DomMeta.getDominators();
-    std::for_each(InitNodeDomBeg, InitNodeDomEnd,
-                  [&](const Node *Dominator) {
-                    auto *DomNodeDominator = NodesToDomNodesMapping[Dominator];
-                    if (DomNodeDominator == DomNode.get())
-                      return;
-                    addSucsessor(*DomNodeDominator, *DomNode);
-                  });
+    auto &OrigNode = DomNode->getMetadata().getOriginalNode();
+    auto &DomMeta = static_cast<const NodeT *>(&OrigNode)->getMetadata();
+    auto [OrigNodeDomBeg, OrigNodeDomEnd] = DomMeta.getDominators();
+    std::for_each(OrigNodeDomBeg, OrigNodeDomEnd, [&](const Node *Dominator) {
+      auto *DomNodeDominator = NodesToDomNodesMapping[Dominator];
+      if (DomNodeDominator == DomNode.get())
+        return;
+      addSucsessor(*DomNodeDominator, *DomNode);
+    });
   };
   std::for_each(DomTreeNodes.begin(), DomTreeNodes.end(), AddNodeDominators);
 }
@@ -73,19 +82,41 @@ DomTreeBuilder<NodeT>::createUnrelatedDomNodes(NodeT &Root,
   };
   DomRoot.reset(CreateDomNode(&Root).release());
 
-  auto MapInitNodesToDomNodes = std::unordered_map<const Node *, DomNode *>{};
-  MapInitNodesToDomNodes.emplace(&Root, DomRoot.get());
+  auto MapOrigNodesToDomNodes = std::unordered_map<const Node *, DomNode *>{};
+  MapOrigNodesToDomNodes.emplace(&Root, DomRoot.get());
   std::for_each(NodesBeg, NodesEnd,
       [&](OwnedNodeT &InitialNode) {
         DomTreeNodes.emplace_back(CreateDomNode(InitialNode.get()));
-        MapInitNodesToDomNodes[InitialNode.get()] = DomTreeNodes.back().get();
+        MapOrigNodesToDomNodes[InitialNode.get()] = DomTreeNodes.back().get();
       });
-  return MapInitNodesToDomNodes;
+  return MapOrigNodesToDomNodes;
 }
 
 template <typename NodeT>
 void DomTreeBuilder<NodeT>::createIDomRelations(
     std::unordered_map<const Node *, DomNode *> &NodesToDomNodesMapping) {
-  
-
+  auto AddNodeImmDom = [&](std::unique_ptr<DomNode> &DomNode) {
+    auto &OrigNode = DomNode->getMetadata().getOriginalNode();
+    auto &DomMeta = static_cast<const NodeT *>(&OrigNode)->getMetadata();
+    auto [OrigNodeDomBeg, OrigNodeDomEnd] = DomMeta.getDominators();
+    auto OrigNodeDomSet =
+        std::unordered_set<const Node *>{OrigNodeDomBeg, OrigNodeDomEnd};
+    auto CheckIDom = [&](const Node *OrigNodeDom) {
+      if (OrigNodeDom == &OrigNode)
+        return;
+      auto &DomMetaOfDom =
+          static_cast<const NodeT *>(OrigNodeDom)->getMetadata();
+      auto DomsBetweenOrigAndCurNodes =
+          subtractSets(OrigNodeDomSet, DomMetaOfDom.getDominatorsSet());
+      // std::swap(OrigNodeDomSet, DomsBetweenOrigAndCurNodes)
+      if (DomsBetweenOrigAndCurNodes.size() == 1) {
+        assert(DomsBetweenOrigAndCurNodes.find(&OrigNode) !=
+               DomsBetweenOrigAndCurNodes.end());
+        auto *IDom = NodesToDomNodesMapping[OrigNodeDom];
+        addSucsessor(*IDom, *DomNode);
+      }
+    };
+    std::for_each(OrigNodeDomBeg, OrigNodeDomEnd, CheckIDom);
+  };
+  std::for_each(DomTreeNodes.begin(), DomTreeNodes.end(), AddNodeImmDom);
 }

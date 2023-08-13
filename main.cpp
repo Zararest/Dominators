@@ -1,5 +1,3 @@
-#define GEN_DAG
-
 #include <DomTreeBuilder.h>
 #include <GraphBuilder.h>
 #include <Utils.h>
@@ -16,7 +14,7 @@ int main() {
          DomDotstream.is_open());
   auto Root = NodeWithDomMeta::Builder{}.createNode();
   ReducibleGraphBuilder<NodeWithDomMeta> GraphBuilder{*Root};
-  for (int i = 0; i < 10000; i++) {
+  for (int i = 0; i < 20; i++) {
     GraphBuilder.mutate();
   }
   auto [Beg, End] = GraphBuilder.getMutableNodes();
@@ -28,7 +26,7 @@ int main() {
   OrderStream << std::endl;
 
   auto DomBuilder = DomTreeBuilder<MetadataNode<DomMetadata>>{};
-  DomBuilder.createDomGraph(*Root, Beg, End);
+  DomBuilder.createDomTree(*Root, Beg, End);
   auto [DomBeg, DomEnd] = DomBuilder.getNodes();
   auto &DomRoot = DomBuilder.getDomRoot();
   printGraph(DomBeg, DomEnd, DomRoot, DomDotstream);

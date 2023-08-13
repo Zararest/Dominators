@@ -1,6 +1,7 @@
 #pragma once
 
 #include <NamedNode.h>
+#include <unordered_set>
 
 template <typename It>
 using GetTypeFromOwnedNodeIt =
@@ -39,4 +40,25 @@ void printGraph(It NodesBeg, It NodesEnd, RootT &Root, std::ostream &Stream) {
     PrintSucsessors(*CurNode);
   });
   Stream << "}" << std::endl;
+}
+
+template <typename T, typename InsertIt>
+void intersectSets(const std::unordered_set<T> &Lhs,
+                   const std::unordered_set<T> &Rhs, InsertIt Intersection) {
+  auto &SmallerSetRef = Lhs.size() < Rhs.size() ? Lhs : Rhs;
+  auto &BiggerSetRef = Lhs.size() >= Rhs.size() ? Lhs : Rhs;
+  std::for_each(SmallerSetRef.begin(), SmallerSetRef.end(), [&](const T &Obj) {
+    if (BiggerSetRef.find(Obj) != BiggerSetRef.end())
+      Intersection = Obj;
+  });
+}
+
+template <typename T>
+std::unordered_set<T> subtractSets(const std::unordered_set<T> &Minuend,
+                                   const std::unordered_set<T> &Subtrahend) {
+  auto Result = std::unordered_set<T>{};
+  std::copy_if(
+      Minuend.begin(), Minuend.end(), std::inserter(Result, Result.begin()),
+      [&](const T &Obj) { return Subtrahend.find(Obj) == Subtrahend.end(); });
+  return Result;
 }

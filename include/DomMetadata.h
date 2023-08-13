@@ -1,6 +1,7 @@
 #pragma once
 
 #include <MetadataNode.h>
+#include <Utils.h>
 
 #include <algorithm>
 #include <limits>
@@ -24,19 +25,8 @@ public:
       return;
     }
     auto Intersection = std::unordered_set<const Node *>{};
-    auto &SmallerSetRef = Dominators.size() < PredMeta.Dominators.size()
-                              ? Dominators
-                              : PredMeta.Dominators;
-    auto &BiggerSetRef = Dominators.size() >= PredMeta.Dominators.size()
-                             ? Dominators
-                             : PredMeta.Dominators;
-    std::for_each(SmallerSetRef.begin(), SmallerSetRef.end(),
-                  [&](const Node *DomNode) {
-                    if (BiggerSetRef.find(DomNode) != BiggerSetRef.end()) {
-                      auto [_, Inserted] = Intersection.insert(DomNode);
-                      assert(Inserted);
-                    }
-                  });
+    intersectSets(Dominators, PredMeta.Dominators,
+                  std::inserter(Intersection, Intersection.begin()));
     assert(Dominators.size() >= Intersection.size());
     std::swap(Dominators, Intersection);
   }
@@ -58,6 +48,14 @@ public:
 
   const auto getDominators() const {
     return std::make_pair(Dominators.begin(), Dominators.end());
+  }
+
+  const std::unordered_set<const Node *> getDominatorsSet() const {
+    return Dominators;
+  }
+
+  bool isDominatedByNode(const Node *ProbDom) {
+    return Dominators.find(ProbDom) != Dominators.end();
   }
 
   virtual ~DomMetadata() = default;
