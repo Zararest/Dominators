@@ -7,16 +7,18 @@
 using DomNode = MetadataNode<DomMetadata>;
 
 int main() {
-  auto DotStream = std::ofstream{"../bin/Graph.dot"};
+  auto MainDotStream = std::ofstream{"../bin/Graph.dot"};
+  auto DomDotstream = std::ofstream{"../bin/DomGraph.dot"};
   auto OrderStream = std::ofstream{"../bin/RPO"};
-  assert(DotStream.is_open() && DotStream.is_open());
+  assert(MainDotStream.is_open() && MainDotStream.is_open() &&
+         DomDotstream.is_open());
   auto Root = DomNode::Builder{}.createNode();
   ReducibleGraphBuilder<DomNode> GraphBuilder{*Root};
-  for (int i = 0; i < 30; i++) {
+  for (int i = 0; i < 10; i++) {
     GraphBuilder.mutate();
   }
   auto [Beg, End] = GraphBuilder.getMutableNodes();
-  printGraph(Beg, End, *Root, DotStream);
+  printGraph(Beg, End, *Root, MainDotStream);
 
   auto RPO = getReversePostOrder(*Root);
   for (auto &It : RPO)
@@ -25,4 +27,7 @@ int main() {
 
   auto DomBuilder = DomTreeBuilder<MetadataNode<DomMetadata>>{};
   DomBuilder.createDomTree(*Root, Beg, End);
+  auto [DomBeg, DomEnd] = DomBuilder.getNodes();
+  auto &DomRoot = DomBuilder.getDomRoot();
+  printGraph(DomBeg, DomEnd, DomRoot, DomDotstream);
 }

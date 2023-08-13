@@ -46,48 +46,53 @@ void DomTreeBuilder<NodeT>::createDomTree(NodeT &Root, OwnedNodesIt NodesBeg,
                                                           DomNodesSet.begin()));
                 });
   
-  auto CreateDomNode = [&](const Node *InitialiNode) {
+  auto CreateDomNode = [&](const Node *InitialNode) {
     auto *InitNamedNodePtr = static_cast<const NamedNode*>(InitialNode);
     auto DomNode = NamedNode::Builder{}.createNode();
     setName(*DomNode, InitNamedNodePtr->getName());
     return DomNode;
   };
-  auto RootNode = DomNodeSet.extract(&Root);
-  assert(RootNode);
-  DomRoot.reset(CreateDomNode(RootNode));
+  assert(DomNodesSet.extract(&Root));
+  DomRoot.reset(CreateDomNode(&Root).release());
 
   auto MapDomNodesToInitNodes = 
     std::unordered_map<NamedNode*, const Node*>{};
   auto MapInitNodesToDomNodes = 
     std::unordered_map<const Node*, NamedNode*>{};
-  MapInitNodesToDomNodes.emplace(RootNode, DomRoot.get());
+  MapInitNodesToDomNodes.emplace(&Root, DomRoot.get());
   std::for_each(DomNodesSet.begin(), DomNodesSet.end(),
                 [&](const Node *InitialNode) {
-                  DomTreeNodes.emplace_back(CreateDomNode(InitialiNode));
-                  MapInitNodesToDomNodes.emplace(DomTreeNodes.back().get(),
-                                                 InitialNode);
-                  MapDomNodesToInitNodes.emplace(InitialNode,
-                                                 DomTreeNodes.back().get());
+                  DomTreeNodes.emplace_back(CreateDomNode(InitialNode));
+                  MapDomNodesToInitNodes[DomTreeNodes.back().get()] = InitialNode;
+                  MapInitNodesToDomNodes[InitialNode] = DomTreeNodes.back().get();
                 });
-  createDomRelations(MapInitNodesToDomNodes);
+  createDomRelations(MapDomNodesToInitNodes, MapInitNodesToDomNodes);
 }
 
 template <typename NodeT>
-void DomTreeBuilder<NodeT>::createDomRelations(std::unordered_map<NamedNode*, const Node*> &DomNodesToNodesMapping) {
+void DomTreeBuilder<NodeT>::createDomRelations(
+                          std::unordered_map<NamedNode*, const Node*>
+                            &DomNodesToNodesMapping,
+                          std::unordered_map<const Node*, NamedNode*>
+                            &NodesToDomNodesMapping) {
   auto AddNodeDominators = 
-    [&](std::unique_ptr<NamedNode> DomNode) {
+    [&](std::unique_ptr<NamedNode> &DomNode) {
       assert(DomNodesToNodesMapping.find(DomNode.get()) != 
             DomNodesToNodesMapping.end());
-      auto [_, InitNode] = DomNodesToNodesMapping.find(DomNode.get());
-      auto InitMetadataNodePtr = static_cast<NodeT*>(InitNode);
-      auto &DomMeta = getMutableMetadata(*InitMetadataNodePtr);
+      auto &InitNode = DomNodesToNodesMapping[DomNode.get()];
+      auto InitMetadataNodePtr = static_cast<const NodeT*>(InitNode);
+      auto &DomMeta = InitMetadataNodePtr->getMetadata();
       auto InitNodeDominators = std::vector<const Node*>{};
       DomMeta.getDominators(std::back_inserter(InitNodeDominators));
       std::for_each(InitNodeDominators.begin(), InitNodeDominators.end(),
                     [&](const Node *Dominator) {
-
+                      auto *DomNodeDominator = 
+                        NodesToDomNodesMapping[Dominator];
+                      if (DomNodeDominator == DomNode.get())
+                        return;
+                      addSucsessor(*DomNodeDominator, *DomNode);
                     });
     };
   std::for_each(DomTreeNodes.begin(), DomTreeNodes.end(),
-                );
+                AddNodeDominators);
 }
