@@ -48,39 +48,30 @@ void DomTreeBuilder<NodeT>::createDomTree(NodeT &Root, OwnedNodesIt NodesBeg,
   
   auto CreateDomNode = [&](const Node *InitialNode) {
     auto *InitNamedNodePtr = static_cast<const NamedNode*>(InitialNode);
-    auto DomNode = NamedNode::Builder{}.createNode();
-    setName(*DomNode, InitNamedNodePtr->getName());
-    return DomNode;
+    return DomNodeConfigurator{}.createDomNodeWithMeta(InitNamedNodePtr);
   };
   assert(DomNodesSet.extract(&Root));
   DomRoot.reset(CreateDomNode(&Root).release());
 
-  auto MapDomNodesToInitNodes = 
-    std::unordered_map<NamedNode*, const Node*>{};
   auto MapInitNodesToDomNodes = 
-    std::unordered_map<const Node*, NamedNode*>{};
+    std::unordered_map<const Node*, DomNode*>{};
   MapInitNodesToDomNodes.emplace(&Root, DomRoot.get());
   std::for_each(DomNodesSet.begin(), DomNodesSet.end(),
                 [&](const Node *InitialNode) {
                   DomTreeNodes.emplace_back(CreateDomNode(InitialNode));
-                  MapDomNodesToInitNodes[DomTreeNodes.back().get()] = InitialNode;
                   MapInitNodesToDomNodes[InitialNode] = DomTreeNodes.back().get();
                 });
-  createDomRelations(MapDomNodesToInitNodes, MapInitNodesToDomNodes);
+  createDomRelations(MapInitNodesToDomNodes);
 }
 
 template <typename NodeT>
 void DomTreeBuilder<NodeT>::createDomRelations(
-                          std::unordered_map<NamedNode*, const Node*>
-                            &DomNodesToNodesMapping,
-                          std::unordered_map<const Node*, NamedNode*>
+                          std::unordered_map<const Node*, DomNode*>
                             &NodesToDomNodesMapping) {
   auto AddNodeDominators = 
-    [&](std::unique_ptr<NamedNode> &DomNode) {
-      assert(DomNodesToNodesMapping.find(DomNode.get()) != 
-            DomNodesToNodesMapping.end());
-      auto &InitNode = DomNodesToNodesMapping[DomNode.get()];
-      auto InitMetadataNodePtr = static_cast<const NodeT*>(InitNode);
+    [&](std::unique_ptr<DomNode> &DomNode) {
+      auto &InitNode = DomNode->getMetadata().getOriginalNode();
+      auto InitMetadataNodePtr = static_cast<const NodeT*>(&InitNode);
       auto &DomMeta = InitMetadataNodePtr->getMetadata();
       auto InitNodeDominators = std::vector<const Node*>{};
       DomMeta.getDominators(std::back_inserter(InitNodeDominators));

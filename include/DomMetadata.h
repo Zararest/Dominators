@@ -69,3 +69,17 @@ public:
 
   virtual ~DomMetadata() = default;
 };
+
+class DomNodeMetadata : public DefaultMeta {
+  const Node *OriginalNode = nullptr;
+
+public:
+  const Node &getOriginalNode() const {
+    assert(OriginalNode);
+    return *OriginalNode;
+  }
+
+  void setOriginalNode(const Node *NewOrigNode) {
+    OriginalNode = NewOrigNode;
+  }
+};

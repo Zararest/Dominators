@@ -1,10 +1,11 @@
 #include <GraphBuilder.h>
 #include <Utils.h>
 #include <DomTreeBuilder.h>
+#include <DomNodeConfig.h>
 
 #include <fstream>
 
-using DomNode = MetadataNode<DomMetadata>;
+using NodeWithDomMeta = MetadataNode<DomMetadata>;
 
 int main() {
   auto MainDotStream = std::ofstream{"../bin/Graph.dot"};
@@ -12,8 +13,8 @@ int main() {
   auto OrderStream = std::ofstream{"../bin/RPO"};
   assert(MainDotStream.is_open() && MainDotStream.is_open() &&
          DomDotstream.is_open());
-  auto Root = DomNode::Builder{}.createNode();
-  ReducibleGraphBuilder<DomNode> GraphBuilder{*Root};
+  auto Root = NodeWithDomMeta::Builder{}.createNode();
+  ReducibleGraphBuilder<NodeWithDomMeta> GraphBuilder{*Root};
   for (int i = 0; i < 10; i++) {
     GraphBuilder.mutate();
   }
@@ -22,7 +23,7 @@ int main() {
 
   auto RPO = getReversePostOrder(*Root);
   for (auto &It : RPO)
-    OrderStream << static_cast<DomNode*>(It)->getName() << " | ";
+    OrderStream << static_cast<NodeWithDomMeta*>(It)->getName() << " | ";
   OrderStream << std::endl;
 
   auto DomBuilder = DomTreeBuilder<MetadataNode<DomMetadata>>{};
