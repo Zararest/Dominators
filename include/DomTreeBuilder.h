@@ -1,7 +1,6 @@
 #pragma once
 
 #include <DomMetadata.h>
-#include <DomNodeConfig.h>
 #include <MetadataNode.h>
 #include <Utils.h>
 
@@ -28,8 +27,16 @@ class DomTreeBuilder : public MetadataNode<DomMetadata>::Builder {
   std::unique_ptr<DomNode> DomRoot;
   std::vector<std::unique_ptr<DomNode>> DomTreeNodes;
 
+  void createIDomRelations(
+      std::unordered_map<const Node *, DomNode *> &NodesToDomNodesMapping);
+
   void createDomRelations(
       std::unordered_map<const Node *, DomNode *> &NodesToDomNodesMapping);
+
+  template <typename OwnedNodesIt>
+  std::unordered_map<const Node *, DomNode *> 
+  createUnrelatedDomNodes(NodeT &Root, OwnedNodesIt NodesBeg,
+                          OwnedNodesIt NodesEnd);
 
 public:
   // Changes metadata in the initial tree.

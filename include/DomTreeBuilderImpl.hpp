@@ -37,10 +37,40 @@ template <typename OwnedNodesIt>
 void DomTreeBuilder<NodeT>::createDomGraph(NodeT &Root, OwnedNodesIt NodesBeg,
                                            OwnedNodesIt NodesEnd) {
   calcDominators(Root, NodesBeg, NodesEnd);
+  auto MapInitNodesToDomNodes = 
+    createUnrelatedDomNodes(Root, NodesBeg, NodesEnd);
+  createDomRelations(MapInitNodesToDomNodes);
+}
 
+template <typename NodeT>
+void DomTreeBuilder<NodeT>::createDomRelations(
+    std::unordered_map<const Node *, DomNode *> &NodesToDomNodesMapping) {
+  auto AddNodeDominators = [&](std::unique_ptr<DomNode> &DomNode) {
+    auto &InitNode = DomNode->getMetadata().getOriginalNode();
+    auto &DomMeta = static_cast<const NodeT *>(&InitNode)->getMetadata();
+    auto [InitNodeDomBeg, InitNodeDomEnd] = 
+      DomMeta.getDominators(std::back_inserter(InitNodeDominators));
+    std::for_each(InitNodeDomBeg, InitNodeDomEnd,
+                  [&](const Node *Dominator) {
+                    auto *DomNodeDominator = NodesToDomNodesMapping[Dominator];
+                    if (DomNodeDominator == DomNode.get())
+                      return;
+                    addSucsessor(*DomNodeDominator, *DomNode);
+                  });
+  };
+  std::for_each(DomTreeNodes.begin(), DomTreeNodes.end(), AddNodeDominators);
+}
+
+template <typename NodeT>
+template <typename OwnedNodesIt>
+std::unordered_map<const Node *, DomNode *> 
+DomTreeBuilder<NodeT>::createUnrelatedDomNodes(NodeT &Root, 
+                                               OwnedNodesIt NodesBeg,
+                                               OwnedNodesIt NodesEnd) {
   auto DomNodesSet = std::unordered_set<const Node *>{};
   std::for_each(NodesBeg, NodesEnd, [&](std::unique_ptr<NodeT> &CurNode) {
     auto &CurNodeMeta = getMutableMetadata(*CurNode);
+    
     CurNodeMeta.getDominators(std::inserter(DomNodesSet, DomNodesSet.begin()));
   });
 
@@ -58,25 +88,12 @@ void DomTreeBuilder<NodeT>::createDomGraph(NodeT &Root, OwnedNodesIt NodesBeg,
         DomTreeNodes.emplace_back(CreateDomNode(InitialNode));
         MapInitNodesToDomNodes[InitialNode] = DomTreeNodes.back().get();
       });
-  createDomRelations(MapInitNodesToDomNodes);
+  return MapInitNodesToDomNodes;
 }
 
 template <typename NodeT>
-void DomTreeBuilder<NodeT>::createDomRelations(
+void DomTreeBuilder<NodeT>::createIDomRelations(
     std::unordered_map<const Node *, DomNode *> &NodesToDomNodesMapping) {
-  auto AddNodeDominators = [&](std::unique_ptr<DomNode> &DomNode) {
-    auto &InitNode = DomNode->getMetadata().getOriginalNode();
-    auto InitMetadataNodePtr = static_cast<const NodeT *>(&InitNode);
-    auto &DomMeta = InitMetadataNodePtr->getMetadata();
-    auto InitNodeDominators = std::vector<const Node *>{};
-    DomMeta.getDominators(std::back_inserter(InitNodeDominators));
-    std::for_each(InitNodeDominators.begin(), InitNodeDominators.end(),
-                  [&](const Node *Dominator) {
-                    auto *DomNodeDominator = NodesToDomNodesMapping[Dominator];
-                    if (DomNodeDominator == DomNode.get())
-                      return;
-                    addSucsessor(*DomNodeDominator, *DomNode);
-                  });
-  };
-  std::for_each(DomTreeNodes.begin(), DomTreeNodes.end(), AddNodeDominators);
+  
+
 }

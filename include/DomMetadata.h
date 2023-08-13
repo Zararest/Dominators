@@ -9,8 +9,7 @@
 // Metadata with node dominators.
 class DomMetadata : public EmptyMetadata {
   // all nodes that dominates current node
-  std::unordered_set<const Node *>;
-  Dominators;
+  std::unordered_set<const Node *> Dominators;
   bool IsDominatedByAll = true;
 
 public:
@@ -24,8 +23,7 @@ public:
       IsDominatedByAll = false;
       return;
     }
-    auto Intersection = std::unordered_set<const Node *>;
-    {};
+    auto Intersection = std::unordered_set<const Node *>{};
     auto &SmallerSetRef = Dominators.size() < PredMeta.Dominators.size()
                               ? Dominators
                               : PredMeta.Dominators;
@@ -58,9 +56,8 @@ public:
 
   void addDominator(const Node *NewDom) { Dominators.insert(NewDom); }
 
-  template <typename InsertIt> void getDominators(InsertIt It) const {
-    std::for_each(Dominators.begin(), Dominators.end(),
-                  [&](const Node *DomNode) { It = DomNode; });
+  const auto getDominators() const {
+    return std::make_pair(Dominators.begin(), Dominators.end());
   }
 
   virtual ~DomMetadata() = default;
