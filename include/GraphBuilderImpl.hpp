@@ -20,6 +20,12 @@ void ReducibleGraphBuilder<T>::splitNode(Node &NodeToSplit) {
 // adds back edge only if node doesn't have one
 template <typename T>
 void ReducibleGraphBuilder<T>::addBackEdge(Node &NodeForEdge) {
+  #ifdef GEN_DAG
+  return;
+  #endif
+  #ifdef GEN_LINEAR
+  return;
+  #endif
   auto [SucsBeg, SucsEnd] = getSucsessors(NodeForEdge);
   auto BackEdgeNode = std::find(SucsBeg, SucsEnd, &NodeForEdge);
   if (BackEdgeNode != SucsEnd)
@@ -29,6 +35,9 @@ void ReducibleGraphBuilder<T>::addBackEdge(Node &NodeForEdge) {
 
 template <typename T>
 void ReducibleGraphBuilder<T>::addPathToSucsessor(Node &NodeForPath) {
+  #ifdef GEN_LINEAR
+  return;
+  #endif
   auto [SucsBeg, SucsEnd] = getSucsessors(NodeForPath);
   auto NumOfSucsessors = std::distance(SucsBeg, SucsEnd);
   if (NumOfSucsessors == 0)

@@ -33,25 +33,25 @@ class DomTreeBuilder : public MetadataNode<DomMetadata>::Builder {
   void createDomRelations(
       std::unordered_map<const Node *, DomNode *> &NodesToDomNodesMapping);
 
-  template <typename OwnedNodesIt>
+  template <typename OwnedNodeIt>
   std::unordered_map<const Node *, DomNode *> 
-  createUnrelatedDomNodes(NodeT &Root, OwnedNodesIt NodesBeg,
-                          OwnedNodesIt NodesEnd);
+  createUnrelatedDomNodes(NodeT &Root, OwnedNodeIt NodesBeg,
+                          OwnedNodeIt NodesEnd);
 
 public:
   // Changes metadata in the initial tree.
-  template <typename OwnedNodesIt>
-  void calcDominators(NodeT &Root, OwnedNodesIt NodesBeg,
-                      OwnedNodesIt NodesEnd);
+  template <typename OwnedNodeIt>
+  void calcDominators(NodeT &Root, OwnedNodeIt NodesBeg,
+                      OwnedNodeIt NodesEnd);
 
   // Builds graph where m->n means that m is in Dom(n).
-  template <typename OwnedNodesIt>
-  void createDomGraph(NodeT &Root, OwnedNodesIt NodesBeg,
-                      OwnedNodesIt NodesEnd);
+  template <typename OwnedNodeIt>
+  void createDomGraph(NodeT &Root, OwnedNodeIt NodesBeg,
+                      OwnedNodeIt NodesEnd);
 
   // Builds tree where m->n means that m is in IDom(n).
-  template <typename OwnedNodesIt>
-  void createDomTree(NodeT &Root, OwnedNodesIt NodesBeg, OwnedNodesIt NodesEnd);
+  template <typename OwnedNodeIt>
+  void createDomTree(NodeT &Root, OwnedNodeIt NodesBeg, OwnedNodeIt NodesEnd);
 
   ConstOwnedNodesRange<DomNode> getNodes() const {
     return {DomTreeNodes.begin(), DomTreeNodes.end()};

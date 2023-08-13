@@ -1,3 +1,5 @@
+#define GEN_DAG
+
 #include <DomTreeBuilder.h>
 #include <GraphBuilder.h>
 #include <Utils.h>
@@ -14,7 +16,7 @@ int main() {
          DomDotstream.is_open());
   auto Root = NodeWithDomMeta::Builder{}.createNode();
   ReducibleGraphBuilder<NodeWithDomMeta> GraphBuilder{*Root};
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 10000; i++) {
     GraphBuilder.mutate();
   }
   auto [Beg, End] = GraphBuilder.getMutableNodes();

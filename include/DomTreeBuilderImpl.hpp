@@ -1,12 +1,12 @@
 // Asumes that nodes are initializaed somehow correctly
 template <typename NodeT>
-template <typename OwnedNodesIt>
-void DomTreeBuilder<NodeT>::calcDominators(NodeT &Root, OwnedNodesIt NodesBeg,
-                                           OwnedNodesIt NodesEnd) {
+template <typename OwnedNodeIt>
+void DomTreeBuilder<NodeT>::calcDominators(NodeT &Root, OwnedNodeIt NodesBeg,
+                                           OwnedNodeIt NodesEnd) {
   static_assert(
-      std::is_same<GetTypeFromOwnedNodeIt<OwnedNodesIt>, NodeT>::value,
+      std::is_same<GetTypeFromOwnedNodeIt<OwnedNodeIt>, NodeT>::value,
       "Iterator should be to the same node type as root");
-  static_assert(!is_const_iterator<OwnedNodesIt>::value,
+  static_assert(!is_const_iterator<OwnedNodeIt>::value,
                 "Nodes should be mutable");
   auto &RootMeta = getMutableMetadata(Root);
   auto RootPtr = static_cast<Node *>(&Root);
@@ -33,9 +33,9 @@ void DomTreeBuilder<NodeT>::calcDominators(NodeT &Root, OwnedNodesIt NodesBeg,
 }
 
 template <typename NodeT>
-template <typename OwnedNodesIt>
-void DomTreeBuilder<NodeT>::createDomGraph(NodeT &Root, OwnedNodesIt NodesBeg,
-                                           OwnedNodesIt NodesEnd) {
+template <typename OwnedNodeIt>
+void DomTreeBuilder<NodeT>::createDomGraph(NodeT &Root, OwnedNodeIt NodesBeg,
+                                           OwnedNodeIt NodesEnd) {
   calcDominators(Root, NodesBeg, NodesEnd);
   auto MapInitNodesToDomNodes = 
     createUnrelatedDomNodes(Root, NodesBeg, NodesEnd);
@@ -48,8 +48,7 @@ void DomTreeBuilder<NodeT>::createDomRelations(
   auto AddNodeDominators = [&](std::unique_ptr<DomNode> &DomNode) {
     auto &InitNode = DomNode->getMetadata().getOriginalNode();
     auto &DomMeta = static_cast<const NodeT *>(&InitNode)->getMetadata();
-    auto [InitNodeDomBeg, InitNodeDomEnd] = 
-      DomMeta.getDominators(std::back_inserter(InitNodeDominators));
+    auto [InitNodeDomBeg, InitNodeDomEnd] = DomMeta.getDominators();
     std::for_each(InitNodeDomBeg, InitNodeDomEnd,
                   [&](const Node *Dominator) {
                     auto *DomNodeDominator = NodesToDomNodesMapping[Dominator];
@@ -62,31 +61,24 @@ void DomTreeBuilder<NodeT>::createDomRelations(
 }
 
 template <typename NodeT>
-template <typename OwnedNodesIt>
+template <typename OwnedNodeIt>
 std::unordered_map<const Node *, DomNode *> 
 DomTreeBuilder<NodeT>::createUnrelatedDomNodes(NodeT &Root, 
-                                               OwnedNodesIt NodesBeg,
-                                               OwnedNodesIt NodesEnd) {
-  auto DomNodesSet = std::unordered_set<const Node *>{};
-  std::for_each(NodesBeg, NodesEnd, [&](std::unique_ptr<NodeT> &CurNode) {
-    auto &CurNodeMeta = getMutableMetadata(*CurNode);
-    
-    CurNodeMeta.getDominators(std::inserter(DomNodesSet, DomNodesSet.begin()));
-  });
-
+                                               OwnedNodeIt NodesBeg,
+                                               OwnedNodeIt NodesEnd) {
+  using OwnedNodeT = typename std::iterator_traits<OwnedNodeIt>::value_type;
   auto CreateDomNode = [&](const Node *InitialNode) {
     auto *InitNamedNodePtr = static_cast<const NamedNode *>(InitialNode);
     return DomNodeConfigurator{}.createDomNodeWithMeta(InitNamedNodePtr);
   };
-  assert(DomNodesSet.extract(&Root));
   DomRoot.reset(CreateDomNode(&Root).release());
 
   auto MapInitNodesToDomNodes = std::unordered_map<const Node *, DomNode *>{};
   MapInitNodesToDomNodes.emplace(&Root, DomRoot.get());
-  std::for_each(
-      DomNodesSet.begin(), DomNodesSet.end(), [&](const Node *InitialNode) {
-        DomTreeNodes.emplace_back(CreateDomNode(InitialNode));
-        MapInitNodesToDomNodes[InitialNode] = DomTreeNodes.back().get();
+  std::for_each(NodesBeg, NodesEnd,
+      [&](OwnedNodeT &InitialNode) {
+        DomTreeNodes.emplace_back(CreateDomNode(InitialNode.get()));
+        MapInitNodesToDomNodes[InitialNode.get()] = DomTreeNodes.back().get();
       });
   return MapInitNodesToDomNodes;
 }

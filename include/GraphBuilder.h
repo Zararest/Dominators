@@ -14,9 +14,8 @@
 // FIXME: move nodes to the separate container
 template <typename T> class ReducibleGraphBuilder : public Node::Builder {
   static_assert(std::is_base_of_v<Node, T>, "Graph should contain only Nodes");
-  using OwnedNode = std::unique_ptr<T>;
 
-  std::vector<OwnedNode> SecondaryNodes;
+  std::vector<std::unique_ptr<T>> SecondaryNodes;
   Node &Root;
   size_t Seed = 1u;
 
