@@ -1,7 +1,6 @@
 #include <GraphBuilder.h>
 #include <Utils.h>
 #include <DomTreeBuilder.h>
-#include <DomNodeConfig.h>
 
 #include <fstream>
 
@@ -27,7 +26,7 @@ int main() {
   OrderStream << std::endl;
 
   auto DomBuilder = DomTreeBuilder<MetadataNode<DomMetadata>>{};
-  DomBuilder.createDomTree(*Root, Beg, End);
+  DomBuilder.createDomGraph(*Root, Beg, End);
   auto [DomBeg, DomEnd] = DomBuilder.getNodes();
   auto &DomRoot = DomBuilder.getDomRoot();
   printGraph(DomBeg, DomEnd, DomRoot, DomDotstream);

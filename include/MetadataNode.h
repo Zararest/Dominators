@@ -2,8 +2,8 @@
 
 #include <NamedNode.h>
 
-struct DefaultMeta {
-  virtual ~DefaultMeta() = default;
+struct EmptyMetadata {
+  virtual ~EmptyMetadata() = default;
 };
 
 template <typename Meta> 

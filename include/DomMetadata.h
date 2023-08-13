@@ -6,11 +6,10 @@
 #include <unordered_set>
 #include <limits>
 
-using DomSetT = std::unordered_set<const Node*>;
-
-class DomMetadata : public DefaultMeta {
+// Metadata with node dominators.
+class DomMetadata : public EmptyMetadata {
   // all nodes that dominates current node
-  DomSetT Dominators;
+  std::unordered_set<const Node*>; Dominators;
   bool IsDominatedByAll = true;
 
 public:
@@ -24,7 +23,7 @@ public:
       IsDominatedByAll = false;
       return;
     }
-    auto Intersection = DomSetT{};
+    auto Intersection = std::unordered_set<const Node*>;{};
     auto &SmallerSetRef = 
       Dominators.size() < PredMeta.Dominators.size() ? Dominators
                                                      : PredMeta.Dominators;
@@ -70,7 +69,8 @@ public:
   virtual ~DomMetadata() = default;
 };
 
-class DomNodeMetadata : public DefaultMeta {
+// Metadata for secondary graph node about original node.
+class OriginalNodeMetadata : public EmptyMetadata {
   const Node *OriginalNode = nullptr;
 
 public:

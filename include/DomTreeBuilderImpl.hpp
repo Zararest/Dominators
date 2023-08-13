@@ -34,7 +34,7 @@ void DomTreeBuilder<NodeT>::calcDominators(NodeT &Root, OwnedNodesIt NodesBeg,
 
 template <typename NodeT>
 template <typename OwnedNodesIt>
-void DomTreeBuilder<NodeT>::createDomTree(NodeT &Root, OwnedNodesIt NodesBeg,
+void DomTreeBuilder<NodeT>::createDomGraph(NodeT &Root, OwnedNodesIt NodesBeg,
                                           OwnedNodesIt NodesEnd) {
   calcDominators(Root, NodesBeg, NodesEnd);
   
