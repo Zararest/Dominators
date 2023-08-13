@@ -24,5 +24,5 @@ int main() {
   OrderStream << std::endl;
 
   auto DomBuilder = DomTreeBuilder<MetadataNode<DomMetadata>>{};
-  DomBuilder.calcDominators(*Root, Beg, End);
+  DomBuilder.createDomTree(*Root, Beg, End);
 }
