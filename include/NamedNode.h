@@ -16,8 +16,8 @@ protected:
   protected:
     void configNode(NamedNode &Node);
 
-    void setName(NamedNode &Node, const std::string &NewName) const { 
-      Node.Name = NewName; 
+    void setName(NamedNode &Node, const std::string &NewName) const {
+      Node.Name = NewName;
     }
 
   public:

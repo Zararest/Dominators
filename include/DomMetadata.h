@@ -3,13 +3,14 @@
 #include <MetadataNode.h>
 
 #include <algorithm>
-#include <unordered_set>
 #include <limits>
+#include <unordered_set>
 
 // Metadata with node dominators.
 class DomMetadata : public EmptyMetadata {
   // all nodes that dominates current node
-  std::unordered_set<const Node*>; Dominators;
+  std::unordered_set<const Node *>;
+  Dominators;
   bool IsDominatedByAll = true;
 
 public:
@@ -23,13 +24,14 @@ public:
       IsDominatedByAll = false;
       return;
     }
-    auto Intersection = std::unordered_set<const Node*>;{};
-    auto &SmallerSetRef = 
-      Dominators.size() < PredMeta.Dominators.size() ? Dominators
-                                                     : PredMeta.Dominators;
-    auto &BiggerSetRef =
-      Dominators.size() >= PredMeta.Dominators.size() ? Dominators
-                                                      : PredMeta.Dominators;
+    auto Intersection = std::unordered_set<const Node *>;
+    {};
+    auto &SmallerSetRef = Dominators.size() < PredMeta.Dominators.size()
+                              ? Dominators
+                              : PredMeta.Dominators;
+    auto &BiggerSetRef = Dominators.size() >= PredMeta.Dominators.size()
+                             ? Dominators
+                             : PredMeta.Dominators;
     std::for_each(SmallerSetRef.begin(), SmallerSetRef.end(),
                   [&](const Node *DomNode) {
                     if (BiggerSetRef.find(DomNode) != BiggerSetRef.end()) {
@@ -54,16 +56,11 @@ public:
     IsDominatedByAll = false;
   }
 
-  void addDominator(const Node *NewDom) {
-    Dominators.insert(NewDom);
-  }
+  void addDominator(const Node *NewDom) { Dominators.insert(NewDom); }
 
-  template <typename InsertIt>
-  void getDominators(InsertIt It) const {
+  template <typename InsertIt> void getDominators(InsertIt It) const {
     std::for_each(Dominators.begin(), Dominators.end(),
-                  [&](const Node *DomNode) {
-                    It = DomNode;
-                  });
+                  [&](const Node *DomNode) { It = DomNode; });
   }
 
   virtual ~DomMetadata() = default;
@@ -79,7 +76,5 @@ public:
     return *OriginalNode;
   }
 
-  void setOriginalNode(const Node *NewOrigNode) {
-    OriginalNode = NewOrigNode;
-  }
+  void setOriginalNode(const Node *NewOrigNode) { OriginalNode = NewOrigNode; }
 };

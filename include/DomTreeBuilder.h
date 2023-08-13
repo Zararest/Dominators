@@ -1,7 +1,7 @@
 #pragma once
 
-#include <DomNodeConfig.h>
 #include <DomMetadata.h>
+#include <DomNodeConfig.h>
 #include <MetadataNode.h>
 #include <Utils.h>
 
@@ -9,9 +9,9 @@
 
 using DomNode = MetadataNode<OriginalNodeMetadata>;
 
-struct DomNodeConfigurator : public MetadataNode<OriginalNodeMetadata>::Builder {
-  std::unique_ptr<DomNode> 
-  createDomNodeWithMeta(const NamedNode *InitialNode) {
+struct DomNodeConfigurator
+    : public MetadataNode<OriginalNodeMetadata>::Builder {
+  std::unique_ptr<DomNode> createDomNodeWithMeta(const NamedNode *InitialNode) {
     auto DomNode = DomNode::Builder{}.createNode();
     setName(*DomNode, InitialNode->getName());
     auto &DomNodeMeta = getMutableMetadata(*DomNode);
@@ -28,8 +28,8 @@ class DomTreeBuilder : public MetadataNode<DomMetadata>::Builder {
   std::unique_ptr<DomNode> DomRoot;
   std::vector<std::unique_ptr<DomNode>> DomTreeNodes;
 
-  void createDomRelations(std::unordered_map<const Node*, DomNode*>
-                            &NodesToDomNodesMapping);
+  void createDomRelations(
+      std::unordered_map<const Node *, DomNode *> &NodesToDomNodesMapping);
 
 public:
   // Changes metadata in the initial tree.
@@ -39,7 +39,8 @@ public:
 
   // Builds graph where m->n means that m is in Dom(n).
   template <typename OwnedNodesIt>
-  void createDomGraph(NodeT &Root, OwnedNodesIt NodesBeg, OwnedNodesIt NodesEnd);
+  void createDomGraph(NodeT &Root, OwnedNodesIt NodesBeg,
+                      OwnedNodesIt NodesEnd);
 
   // Builds tree where m->n means that m is in IDom(n).
   template <typename OwnedNodesIt>

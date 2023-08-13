@@ -10,13 +10,13 @@
 class Node;
 
 struct ConstNodesRange {
-  std::vector<Node*>::const_iterator Begin;
-  std::vector<Node*>::const_iterator End;
+  std::vector<Node *>::const_iterator Begin;
+  std::vector<Node *>::const_iterator End;
 };
 
 struct NodesRange {
-  std::vector<Node*>::iterator Begin;
-  std::vector<Node*>::iterator End;
+  std::vector<Node *>::iterator Begin;
+  std::vector<Node *>::iterator End;
 };
 
 template <typename T> struct ConstOwnedNodesRange {
@@ -69,7 +69,7 @@ protected:
     std::unique_ptr<Node> createNode() const {
       return std::unique_ptr<Node>(new Node);
     }
-    
+
     ConstNodesRange getSucsessors(const Node &Node) const {
       return {Node.Sucsessors.begin(), Node.Sucsessors.end()};
     }

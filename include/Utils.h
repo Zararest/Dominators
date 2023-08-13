@@ -6,11 +6,10 @@ template <typename It>
 using GetTypeFromOwnedNodeIt =
     typename std::iterator_traits<It>::value_type::element_type;
 
-template<typename Iterator>
-struct is_const_iterator {
-    using PtrT = typename std::iterator_traits<Iterator>::pointer; 
-    static const bool value = 
-        std::is_const<typename std::remove_pointer<PtrT>::type>::value;
+template <typename Iterator> struct is_const_iterator {
+  using PtrT = typename std::iterator_traits<Iterator>::pointer;
+  static const bool value =
+      std::is_const<typename std::remove_pointer<PtrT>::type>::value;
 };
 
 std::vector<Node *> getReversePostOrder(Node &Root);

@@ -1,6 +1,6 @@
+#include <DomTreeBuilder.h>
 #include <GraphBuilder.h>
 #include <Utils.h>
-#include <DomTreeBuilder.h>
 
 #include <fstream>
 
@@ -22,7 +22,7 @@ int main() {
 
   auto RPO = getReversePostOrder(*Root);
   for (auto &It : RPO)
-    OrderStream << static_cast<NodeWithDomMeta*>(It)->getName() << " | ";
+    OrderStream << static_cast<NodeWithDomMeta *>(It)->getName() << " | ";
   OrderStream << std::endl;
 
   auto DomBuilder = DomTreeBuilder<MetadataNode<DomMetadata>>{};

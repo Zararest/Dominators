@@ -45,9 +45,8 @@ void ReducibleGraphBuilder<T>::addPathToSucsessor(Node &NodeForPath) {
 
 template <typename T> void ReducibleGraphBuilder<T>::mutate() {
   auto NodesNum = SecondaryNodes.size();
-  Node &NodeToMutate = (NodesNum == 0)
-                           ? Root
-                           : *SecondaryNodes[getRandomValue(0, NodesNum)];
+  Node &NodeToMutate =
+      (NodesNum == 0) ? Root : *SecondaryNodes[getRandomValue(0, NodesNum)];
   constexpr auto MutationsNum = 3;
   switch (getRandomValue(0, MutationsNum)) {
   case Split:

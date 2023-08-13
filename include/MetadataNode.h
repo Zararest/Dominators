@@ -6,8 +6,7 @@ struct EmptyMetadata {
   virtual ~EmptyMetadata() = default;
 };
 
-template <typename Meta> 
-class MetadataNode : public NamedNode {
+template <typename Meta> class MetadataNode : public NamedNode {
 protected:
   static_assert(std::is_default_constructible<Meta>::value,
                 "Metadata should be default constructable");
@@ -21,9 +20,9 @@ protected:
       Node.Metadata.reset(new Meta);
     }
 
-    Meta &getMutableMetadata(MetadataNode &Node) { 
+    Meta &getMutableMetadata(MetadataNode &Node) {
       assert(Node.Metadata.get());
-      return *Node.Metadata; 
+      return *Node.Metadata;
     }
 
   public:
@@ -45,9 +44,9 @@ public:
     virtual ~Builder() = default;
   };
 
-  const Meta &getMetadata() const { 
+  const Meta &getMetadata() const {
     assert(Metadata.get());
-    return *Metadata; 
+    return *Metadata;
   }
 
   virtual ~MetadataNode() = default;
