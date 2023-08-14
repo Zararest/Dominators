@@ -47,7 +47,7 @@ void buildUserGraph(const std::string &WorkingDir,
   printGraph(OrigGraphBeg, OrigGraphEnd, Builder.getRoot(), MainDotStream);
 
   auto DomBuilder = DomTreeBuilder<MetadataNode<DomMetadata>>{};
-  DomBuilder.createDomGraph(Builder.getRoot(), OrigGraphBeg, OrigGraphEnd);
+  DomBuilder.createDomTree(Builder.getRoot(), OrigGraphBeg, OrigGraphEnd);
   auto [DomGraphBeg, DomGraphEnd] = DomBuilder.getNodes();
   printGraph(DomGraphBeg, DomGraphEnd, DomBuilder.getDomRoot(),
              DomTreeDotStream);

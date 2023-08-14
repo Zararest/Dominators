@@ -36,7 +36,10 @@ public:
     return {UserGraphNodes.begin(), UserGraphNodes.end()};
   }
 
-  NodeT &getRoot() { return *UserRoot; }
+  NodeT &getRoot() { 
+    assert(UserRoot);
+    return *UserRoot; 
+  }
 };
 
 #include <UserGraphBuilderImpl.hpp>
