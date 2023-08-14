@@ -36,8 +36,8 @@ void demo(const std::string &WorkingDir) {
 
 void buildUserGraph(const std::string &WorkingDir,
                     const std::string &UserGraphName) {
-  auto MainDotStream = std::ofstream{WorkingDir + "Graph.dot"};
-  auto DomTreeDotStream = std::ofstream{WorkingDir + "DomTree.dot"};
+  auto MainDotStream = std::ofstream{WorkingDir + "UserGraph.dot"};
+  auto DomTreeDotStream = std::ofstream{WorkingDir + "UserDomTree.dot"};
   auto UserGraphStream = std::ifstream(UserGraphName);
   assert(MainDotStream.is_open() && DomTreeDotStream.is_open());
 
