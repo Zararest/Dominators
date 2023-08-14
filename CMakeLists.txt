@@ -9,4 +9,7 @@ target_link_libraries(Proto PRIVATE
 target_link_libraries(Proto PRIVATE
                       Utils)                                                         
 
+set(BIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin/)
+add_definitions(-DWORKING_DIR="${BIN_DIR}")
+                      
 add_subdirectory(src)

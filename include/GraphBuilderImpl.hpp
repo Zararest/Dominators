@@ -1,5 +1,5 @@
-template <typename T>
-size_t ReducibleGraphBuilder<T>::getRandomValue(size_t From, size_t To) {
+template <typename NodeT>
+size_t ReducibleGraphBuilder<NodeT>::getRandomValue(size_t From, size_t To) {
   assert(To > From);
   Seed ^= Seed << 13;
   Seed ^= Seed >> 7;
@@ -7,9 +7,9 @@ size_t ReducibleGraphBuilder<T>::getRandomValue(size_t From, size_t To) {
   return From + (Seed % (To - From));
 }
 
-template <typename T>
-void ReducibleGraphBuilder<T>::splitNode(Node &NodeToSplit) {
-  auto NewNode = typename T::Builder{}.createNode();
+template <typename NodeT>
+void ReducibleGraphBuilder<NodeT>::splitNode(Node &NodeToSplit) {
+  auto NewNode = typename NodeT::Builder{}.createNode();
   auto &NewNodeRef = *NewNode;
   swapSucsessors(NewNodeRef, NodeToSplit);
   addSucsessor(NodeToSplit, NewNodeRef);
@@ -18,9 +18,9 @@ void ReducibleGraphBuilder<T>::splitNode(Node &NodeToSplit) {
 
 // FIXME: check if this will be reducible graph
 // adds back edge only if node doesn't have one
-template <typename T>
-void ReducibleGraphBuilder<T>::addBackEdge(Node &NodeForEdge) {
-  #ifdef GEN_DAG
+template <typename NodeT>
+void ReducibleGraphBuilder<NodeT>::addBackEdge(Node &NodeForEdge) {
+#ifdef GEN_DAG
   return;
   #endif
   #ifdef GEN_LINEAR
@@ -33,9 +33,9 @@ void ReducibleGraphBuilder<T>::addBackEdge(Node &NodeForEdge) {
   addSucsessor(NodeForEdge, NodeForEdge);
 }
 
-template <typename T>
-void ReducibleGraphBuilder<T>::addPathToSucsessor(Node &NodeForPath) {
-  #ifdef GEN_LINEAR
+template <typename NodeT>
+void ReducibleGraphBuilder<NodeT>::addPathToSucsessor(Node &NodeForPath) {
+#ifdef GEN_LINEAR
   return;
   #endif
   auto [SucsBeg, SucsEnd] = getSucsessors(NodeForPath);
@@ -43,7 +43,7 @@ void ReducibleGraphBuilder<T>::addPathToSucsessor(Node &NodeForPath) {
   if (NumOfSucsessors == 0)
     return;
   auto DuplicatePathTo = getRandomValue(0, NumOfSucsessors);
-  auto NewNode = typename T::Builder{}.createNode();
+  auto NewNode = typename NodeT::Builder{}.createNode();
   auto &NewNodeRef = *NewNode;
   addSucsessor(NodeForPath, NewNodeRef);
   auto [NewSucsBeg, _] = getMutableSucsessors(NodeForPath);
@@ -52,7 +52,7 @@ void ReducibleGraphBuilder<T>::addPathToSucsessor(Node &NodeForPath) {
   SecondaryNodes.emplace_back(std::move(NewNode));
 }
 
-template <typename T> void ReducibleGraphBuilder<T>::mutate() {
+template <typename NodeT> void ReducibleGraphBuilder<NodeT>::mutate() {
   auto NodesNum = SecondaryNodes.size();
   Node &NodeToMutate =
       (NodesNum == 0) ? Root : *SecondaryNodes[getRandomValue(0, NodesNum)];

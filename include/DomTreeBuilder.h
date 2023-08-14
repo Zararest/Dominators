@@ -58,6 +58,8 @@ public:
   }
 
   const DomNode &getDomRoot() const { return *DomRoot; }
+
+  virtual ~DomTreeBuilder() = default;
 };
 
 #include <DomTreeBuilderImpl.hpp>

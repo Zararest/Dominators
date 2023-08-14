@@ -108,7 +108,6 @@ void DomTreeBuilder<NodeT>::createIDomRelations(
           static_cast<const NodeT *>(OrigNodeDom)->getMetadata();
       auto DomsBetweenOrigAndCurNodes =
           subtractSets(OrigNodeDomSet, DomMetaOfDom.getDominatorsSet());
-      // std::swap(OrigNodeDomSet, DomsBetweenOrigAndCurNodes)
       if (DomsBetweenOrigAndCurNodes.size() == 1) {
         assert(DomsBetweenOrigAndCurNodes.find(&OrigNode) !=
                DomsBetweenOrigAndCurNodes.end());

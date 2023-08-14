@@ -1,0 +1,30 @@
+digraph Dump {
+node[color=red,fontsize=14, style=filled]
+"0x564cdb1c9d90" [label = "Root" fillcolor=green]
+"0x564cdb1c9eb0" [label = "0" ]
+"0x564cdb1c9eb0" -> "0x564cdb1c9fb0"
+"0x564cdb1c9eb0" -> "0x564cdb1ca0f0"
+"0x564cdb1c9fb0" [label = "1" ]
+"0x564cdb1c9fb0" -> "0x564cdb1ca1f0"
+"0x564cdb1c9fb0" -> "0x564cdb1ca330"
+"0x564cdb1ca0f0" [label = "4" ]
+"0x564cdb1ca0f0" -> "0x564cdb1ca330"
+"0x564cdb1ca0f0" -> "0x564cdb1ca4e0"
+"0x564cdb1ca1f0" [label = "2" ]
+"0x564cdb1ca1f0" -> "0x564cdb1ca330"
+"0x564cdb1ca330" [label = "3" ]
+"0x564cdb1ca330" -> "0x564cdb1ca1f0"
+"0x564cdb1ca330" -> "0x564cdb1ca4e0"
+"0x564cdb1ca4e0" [label = "5" ]
+"0x564cdb1ca4e0" -> "0x564cdb1ca330"
+}
+digraph Dump {
+node[color=red,fontsize=14, style=filled]
+"0x564cdb1ca980" [label = "Root" fillcolor=green]
+"0x564cdb1caaa0" [label = "0" ]
+"0x564cdb1cab70" [label = "1" ]
+"0x564cdb1cac20" [label = "4" ]
+"0x564cdb1cace0" [label = "2" ]
+"0x564cdb1cad90" [label = "3" ]
+"0x564cdb1cae90" [label = "5" ]
+}

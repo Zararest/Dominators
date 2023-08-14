@@ -12,10 +12,12 @@
 */
 
 // FIXME: move nodes to the separate container
-template <typename T> class ReducibleGraphBuilder : public Node::Builder {
-  static_assert(std::is_base_of_v<Node, T>, "Graph should contain only Nodes");
+template <typename NodeT>
+class ReducibleGraphBuilder final : public Node::Builder {
+  static_assert(std::is_base_of_v<Node, NodeT>,
+                "Graph should contain only Nodes");
 
-  std::vector<std::unique_ptr<T>> SecondaryNodes;
+  std::vector<std::unique_ptr<NodeT>> SecondaryNodes;
   Node &Root;
   size_t Seed = 1u;
 
@@ -39,11 +41,11 @@ public:
   //  -add another way to the one of the sucsessors
   void mutate();
 
-  ConstOwnedNodesRange<T> getNodes() const {
+  ConstOwnedNodesRange<NodeT> getNodes() const {
     return {SecondaryNodes.begin(), SecondaryNodes.end()};
   }
 
-  OwnedNodesRange<T> getMutableNodes() {
+  OwnedNodesRange<NodeT> getMutableNodes() {
     return {SecondaryNodes.begin(), SecondaryNodes.end()};
   }
 };
