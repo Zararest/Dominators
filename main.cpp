@@ -60,17 +60,16 @@ void nextArg(int &Argc, char **&Argv) {
 
 int main(int Argc, char **Argv) {
   auto WorkingDir = std::string{};
-#ifdef WORKING_DIR
-  WorkingDir = WORKING_DIR;
-#endif
   assert(Argc > 0);
   nextArg(Argc, Argv);
   auto InputGraphName = std::string{};
   auto ValidArg = false;
   while (Argc > 0) {
     auto CurArg = std::string{Argv[0]};
-    if (CurArg == std::string{"--no-working-dir"}) {
-      WorkingDir = "";
+    if (CurArg == std::string{"--custom-working-dir"}) {
+      #ifdef WORKING_DIR
+        WorkingDir = WORKING_DIR;
+      #endif
       ValidArg = true;
     }
     if (CurArg == std::string{"--input-graph"}) {

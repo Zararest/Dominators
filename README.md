@@ -26,4 +26,5 @@ Graph and its dominator tree will be generated.
 ```bash
 ./Graph  --input-graph ../bin/InputExample
 ```
-Graph and its domiantor tree wil be ganerated in the `bin` directory. In order to generate files near binary use `--no-working-dir` option.
+Graph and its domiantor tree wil be ganerated near binary. 
+In order to generate files in `./bin` directory use `--custom-working-dir` option.
